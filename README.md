@@ -1,4 +1,4 @@
-# Proyek Tengah Semester C08 - PBP Gasal 2024/2025
+# Proyek Akhir Semester C08 - PBP Gasal 2024/2025
 - [Nama Aplikasi](#nama-aplikasi-rasa-nusantara)
 - [Profil Kelompok](#anggota-kelompok)
 - [Tautan Aplikasi](#url-deployment)
