@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rasanusantara_mobile/Katalog/screens/restaurant_list_page.dart';
 
 class MyHomePage extends StatelessWidget {
   final String npm = '5000000000'; // NPM
@@ -152,11 +153,20 @@ class ItemCard extends StatelessWidget {
       child: InkWell(
         // Aksi ketika kartu ditekan.
         onTap: () {
-          // Menampilkan pesan SnackBar saat kartu ditekan.
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(SnackBar(
-                content: Text("Kamu telah menekan tombol ${item.name}!")));
+          // Modifikasi bagian ini untuk navigasi
+          if (item.name == "Lihat Mood") {  // Ketika tombol Lihat Mood ditekan
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const RestaurantListPage(),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(SnackBar(
+                  content: Text("Kamu telah menekan tombol ${item.name}!")));
+          }
         },
         // Container untuk menyimpan Icon dan Text
         child: Container(
