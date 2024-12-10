@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rasanusantara_mobile/menu.dart';
+import 'package:rasanusantara_mobile/profileandfavorite.dart'; // Import the main menu screen
 
 void main() {
   runApp(const MyApp());
@@ -8,18 +9,18 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Rasa Nusantara',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSwatch(
           primarySwatch: Colors.brown,
         ).copyWith(secondary: Colors.brown[900]),
         useMaterial3: true,
       ),
-      home: MyHomePage(),
+      home: const MenuPage(), // Homepage as the main screen
+      debugShowCheckedModeBanner: false,
     );
   }
 }
