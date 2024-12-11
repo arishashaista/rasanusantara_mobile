@@ -21,6 +21,21 @@ class ReviewPage extends StatefulWidget {
 class _ReviewPageState extends State<ReviewPage> {
   double _rating = 4.0;
   final TextEditingController _commentController = TextEditingController();
+  String currentUsername = "";
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUsername();
+  }
+
+  Future<void> getCurrentUsername() async {
+    final request = context.read<CookieRequest>();
+    final response = await request.get('http://127.0.0.1:8000/reviews/get_username/');
+    setState(() {
+      currentUsername = response['username'];
+    });
+  }
 
   Future<void> submitReview() async {
     final request = context.read<CookieRequest>();
@@ -99,6 +114,135 @@ class _ReviewPageState extends State<ReviewPage> {
       );
       return [];
     }
+  }
+
+  Future<void> deleteReview(int reviewId) async {
+    final request = context.read<CookieRequest>();
+    try {
+      final response = await request.post(
+        'http://127.0.0.1:8000/reviews/delete-review-flutter/$reviewId/',
+        {
+          'review_id': reviewId.toString(),
+        },
+      );
+
+      if (response['status'] == 'success') {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'])),
+        );
+        setState(() {
+          fetchReviews();
+        });
+      } else {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message']),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> editReview(int reviewId, double rating, String comment) async {
+    final request = context.read<CookieRequest>();
+    try {
+      final response = await request.post(
+        'http://127.0.0.1:8000/reviews/edit-review-flutter/$reviewId/',
+        {
+          'rating': rating.toInt().toString(),
+          'comment': comment,
+        },
+      );
+
+      if (response['status'] == 'success') {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'])),
+        );
+        setState(() {
+          fetchReviews();
+        });
+      } else {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message']),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void showEditReviewModal(Review review) {
+    double editRating = review.fields.rating.toDouble();
+    final editCommentController = TextEditingController(text: review.fields.comment);
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Edit Review'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            RatingBar.builder(
+              initialRating: editRating,
+              minRating: 1,
+              direction: Axis.horizontal,
+              itemCount: 5,
+              itemBuilder: (context, _) => Icon(
+                Icons.star,
+                color: Colors.amber,
+              ),
+              onRatingUpdate: (rating) {
+                editRating = rating;
+              },
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: editCommentController,
+              decoration: InputDecoration(
+                labelText: 'Review',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              editReview(review.pk, editRating, editCommentController.text);
+              Navigator.pop(context);
+            },
+            child: Text('Simpan'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -216,10 +360,36 @@ class _ReviewPageState extends State<ReviewPage> {
                               children: [
                                 Icon(Icons.person),
                                 SizedBox(width: 8),
-                                Text(
-                                  review.fields.user,
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                Expanded(
+                                  child: Text(
+                                    review.fields.user,
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
                                 ),
+                                if (review.fields.user == currentUsername)
+                                  PopupMenuButton<String>(
+                                    icon: Icon(Icons.more_vert),
+                                    onSelected: (value) {
+                                      if (value == 'edit') {
+                                        showEditReviewModal(review);
+                                      } else if (value == 'delete') {
+                                        deleteReview(review.pk);
+                                      }
+                                    },
+                                    itemBuilder: (BuildContext context) => [
+                                      PopupMenuItem(
+                                        value: 'edit',
+                                        child: Text('Edit'),
+                                      ),
+                                      PopupMenuItem(
+                                        value: 'delete',
+                                        child: Text(
+                                          'Delete',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                               ],
                             ),
                             SizedBox(height: 8),
