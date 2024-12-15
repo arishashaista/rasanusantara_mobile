@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:rasanusantara_mobile/menu.dart';
 import 'package:rasanusantara_mobile/navbar.dart';
-import 'package:rasanusantara_mobile/profileandfavorite.dart'; // Import the main menu screen
+import 'package:rasanusantara_mobile/profileandfavorite.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:rasanusantara_mobile/authentication/screens/login.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    Provider(
+      create: (context) => CookieRequest(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

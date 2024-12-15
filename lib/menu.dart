@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:rasanusantara_mobile/model.dart';
+import 'package:rasanusantara_mobile/Katalog/screens/restaurant_list_page.dart';
 
 class MenuPage extends StatelessWidget {
   const MenuPage({Key? key}) : super(key: key);

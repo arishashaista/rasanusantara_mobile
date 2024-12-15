@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:rasanusantara_mobile/menu.dart';
 import 'package:rasanusantara_mobile/profileandfavorite.dart';
+import 'package:rasanusantara_mobile/authentication/screens/login.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
 
 class Navbar extends StatefulWidget {
   const Navbar({super.key});
@@ -12,22 +15,29 @@ class Navbar extends StatefulWidget {
 class _NavbarState extends State<Navbar> {
   int selectedIndex = 0;
 
-  // Daftar halaman yang akan ditampilkan pada body tergantung selectedIndex
-  final pages = [
-    const MenuPage(), // index 0: Home (MenuPage)
-    Container(), // index 1: Restaurant (placeholder)
-    Container(), // index 2: Calendar (placeholder)
-    const ProfileFavorite(), // index 3: Profile Page
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      selectedIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
+    // Tentukan halaman profile berdasarkan status login
+    final profilePage = request.loggedIn
+        ? const ProfileFavorite() // Sudah login
+        : const LoginPage(); // Belum login, arahkan ke halaman login
+
+    // Daftar halaman yang akan ditampilkan
+    final pages = [
+      const MenuPage(), // index 0: Home (MenuPage)
+      Container(), // index 1: Restaurant (placeholder)
+      Container(), // index 2: Calendar (placeholder)
+      profilePage, // index 3: Profile Page
+    ];
+
+    void _onItemTapped(int index) {
+      setState(() {
+        selectedIndex = index;
+      });
+    }
+
     return Scaffold(
       body: pages[selectedIndex],
       bottomNavigationBar: Container(
@@ -37,11 +47,10 @@ class _NavbarState extends State<Navbar> {
         ),
         child: SafeArea(
           child: Row(
-            // Coba spaceAround atau spaceBetween untuk jarak yang lebih lebar
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               IconButton(
-                iconSize: 30, // atur ukuran icon, misal 30
+                iconSize: 30,
                 icon: Icon(
                   Icons.home_rounded,
                   color: selectedIndex == 0 ? Colors.orange : Colors.white,
