@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rasanusantara_mobile/menu.dart';
+import 'package:rasanusantara_mobile/navbar.dart';
 import 'package:rasanusantara_mobile/profileandfavorite.dart'; // Import the main menu screen
 
 void main() {
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
         ).copyWith(secondary: Colors.brown[900]),
         useMaterial3: true,
       ),
-      home: const MenuPage(), // Homepage as the main screen
+      home: const Navbar(), // Homepage as the main screen
       debugShowCheckedModeBanner: false,
     );
   }

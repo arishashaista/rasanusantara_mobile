@@ -6,10 +6,8 @@ import 'package:rasanusantara_mobile/model.dart';
 class MenuPage extends StatelessWidget {
   const MenuPage({Key? key}) : super(key: key);
 
-  // Fungsi untuk fetch data dari endpoint /json
   Future<List<ProductEntry>> fetchProducts() async {
-    final url =
-        Uri.parse('http://127.0.0.1:8000/json'); // Ganti dengan endpoint Anda
+    final url = Uri.parse('http://127.0.0.1:8000/json');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -29,24 +27,20 @@ class MenuPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Menu'),
-        backgroundColor: Colors.orange,
-      ),
       body: FutureBuilder<List<ProductEntry>>(
         future: fetchProducts(),
         builder: (context, snapshot) {
-          // Jika masih loading
+          // Loading state
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          // Jika ada error
+          // Error state
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
 
-          // Jika data kosong
+          // Data kosong
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(
               child: Text(
@@ -57,102 +51,276 @@ class MenuPage extends StatelessWidget {
             );
           }
 
-          // Data berhasil di-load
+          // Data didapat
           final products = snapshot.data!;
 
-          // Menampilkan dalam grid
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: GridView.builder(
-              itemCount: products.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.75,
-                crossAxisSpacing: 8.0,
-                mainAxisSpacing: 8.0,
+          // Sort products by rating descending
+          products.sort((a, b) => b.fields.rating.compareTo(a.fields.rating));
+          // Ambil hanya 8 produk dengan rating tertinggi
+          final topProducts = products.take(8).toList();
+
+          return CustomScrollView(
+            slivers: [
+              // Bagian atas dengan background image dan search bar
+              SliverToBoxAdapter(
+                child: Stack(
+                  children: [
+                    Container(
+                      height: 300,
+                      width: double.infinity,
+                      decoration: const BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('lib/assets/Homepage.png'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: MediaQuery.of(context).padding.top + 8,
+                      left: 16,
+                      right: 16,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 16),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                hintText: 'Ingin makan apa hari ini?',
+                                border: InputBorder.none,
+                                prefixIcon: const Icon(Icons.search,
+                                    color: Colors.orange),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 14),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              itemBuilder: (context, index) {
-                final product = products[index];
-                return _buildProductCard(product.fields);
-              },
-            ),
+
+              // Section "Restoran Populer"
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Restoran Populer',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Montserrat',
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          // Aksi untuk tombol "Lainnya"
+                        },
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: const Text('Lainnya'),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+
+              // List Horizontal restoran populer (topProducts)
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 180,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: topProducts.length,
+                    itemBuilder: (context, index) {
+                      final product = topProducts[index];
+                      return Container(
+                        width: 200,
+                        margin: const EdgeInsets.only(right: 16),
+                        child: FavoriteProductCard(fields: product.fields),
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+              // Section "Restoran Populer" kedua (topProducts)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Restoran Populer',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Montserrat',
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          // Aksi untuk tombol "Lainnya"
+                        },
+                        style: TextButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                        child: const Text('Lainnya'),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+
+              // List Horizontal restoran populer kedua (topProducts)
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: 220,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: topProducts.length,
+                    itemBuilder: (context, index) {
+                      final product = topProducts[index];
+                      return Container(
+                        width: 160,
+                        margin: const EdgeInsets.only(right: 16),
+                        child: FavoriteProductCard(fields: product.fields),
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 40),
+              ),
+            ],
           );
         },
       ),
     );
   }
+}
 
-  // Widget untuk menampilkan masing-masing produk
-  Widget _buildProductCard(Fields fields) {
+// Widget Stateful untuk menampilkan card dengan toggle favorite
+class FavoriteProductCard extends StatefulWidget {
+  final Fields fields;
+  const FavoriteProductCard({Key? key, required this.fields}) : super(key: key);
+
+  @override
+  State<FavoriteProductCard> createState() => _FavoriteProductCardState();
+}
+
+class _FavoriteProductCardState extends State<FavoriteProductCard> {
+  bool isFavorite = false;
+
+  @override
+  Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      elevation: 2,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      elevation: 1,
+      child: Stack(
         children: [
-          // Jika image adalah asset lokal, gunakan Image.asset
-          // Jika image adalah URL, gunakan Image.network
-          // Contoh di sini diasumsikan adalah asset lokal:
-          Expanded(
-            child: fields.image.isNotEmpty
-                ? ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(8),
-                        topRight: Radius.circular(8)),
-                    child: Image.network(
-                      fields.image,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    ),
-                  )
-                : Container(
-                    alignment: Alignment.center,
-                    color: Colors.grey.shade200,
-                    child:
-                        const Icon(Icons.image, size: 50, color: Colors.grey),
-                  ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              fields.name,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: widget.fields.image.isNotEmpty
+                    ? ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(8),
+                            topRight: Radius.circular(8)),
+                        child: Image.network(
+                          widget.fields.image,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                        ),
+                      )
+                    : Container(
+                        alignment: Alignment.center,
+                        color: Colors.grey.shade200,
+                        child: const Icon(Icons.image,
+                            size: 50, color: Colors.grey),
+                      ),
               ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              fields.location,
-              style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-            child: Text(
-              'Price: \$${fields.averagePrice}',
-              style: const TextStyle(fontSize: 12),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-            child: Row(
-              children: [
-                const Icon(Icons.star, color: Colors.orange, size: 14),
-                const SizedBox(width: 4),
-                Text(
-                  '${fields.rating.toString()}/5',
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  widget.fields.name,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 12,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ],
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+                child: Text(
+                  widget.fields.location,
+                  style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+                child: Row(
+                  children: [
+                    const Icon(Icons.star, color: Colors.orange, size: 14),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${widget.fields.rating.toString()}/5',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
+          // Favorite button di pojok kanan atas
+          Positioned(
+            top: 8,
+            right: 8,
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  isFavorite = !isFavorite;
+                });
+              },
+              child: Icon(
+                Icons.favorite,
+                color: isFavorite ? Colors.red : Colors.grey,
+              ),
             ),
           ),
         ],
