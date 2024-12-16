@@ -1,7 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
-import '../models/restaurant.dart';
+import 'package:rasanusantara_mobile/restaurant.dart';
 
 class RestaurantCard extends StatefulWidget {
   final Restaurant restaurant;
@@ -20,35 +21,69 @@ class RestaurantCard extends StatefulWidget {
 class _RestaurantCardState extends State<RestaurantCard> {
   bool isFavorite = false;
 
-  Future<void> toggleFavorite(CookieRequest request) async {
-    if (request.loggedIn) {
-      // Simulasi Toggle Favorite (update logika sesuai backend)
-      setState(() {
-        isFavorite = !isFavorite;
-      });
+  @override
+  void initState() {
+    super.initState();
+    checkFavoriteStatus();
+  }
 
-      // Contoh logika jika ingin mengirim request ke server
+  // **1. Cek Status Favorit dari Backend**
+  Future<void> checkFavoriteStatus() async {
+    final request = Provider.of<CookieRequest>(context, listen: false);
+    final url = 'http://127.0.0.1:8000/favorite/json/';
+
+    try {
+      final response = await request.get(url);
+      if (response != null) {
+        setState(() {
+          isFavorite = response.any(
+            (fav) => fav['id'] == widget.restaurant.id,
+          );
+        });
+      }
+    } catch (e) {
+      debugPrint('Error fetching favorite status: $e');
+    }
+  }
+
+  Future<void> toggleFavorite() async {
+    final request = Provider.of<CookieRequest>(context, listen: false);
+    final url = 'http://127.0.0.1:8000/favorite/toggle-favorite/';
+
+    try {
       final response = await request.postJson(
-        'http://127.0.0.1:8000/favorite/toggle-favorite/',
-        {'restaurant_id': widget.restaurant.id},
+        url,
+        jsonEncode({'restaurant_id': widget.restaurant.id}),
       );
 
-      if (response['success'] == true) {
+      // Parse response as Map
+      if (response is Map<String, dynamic> && response['success'] == true) {
         setState(() {
           isFavorite = response['status'] == 'favorited';
         });
       } else {
-        // Handle error
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? 'Terjadi kesalahan')),
+        throw Exception(response['message'] ?? 'Gagal mengubah status favorit');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Kesalahan'),
+            content: Text('Gagal terhubung ke server: $e'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
         );
       }
-    } else {
-      // Jika belum login, tampilkan peringatan
-      _showLoginAlert();
     }
   }
 
+  // **3. Tampilkan Alert Jika Belum Login**
   void _showLoginAlert() {
     showDialog(
       context: context,
@@ -71,10 +106,7 @@ class _RestaurantCardState extends State<RestaurantCard> {
     final request = context.watch<CookieRequest>();
 
     return Card(
-      margin: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 8,
-      ),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -86,7 +118,6 @@ class _RestaurantCardState extends State<RestaurantCard> {
           width: double.infinity,
           height: 100,
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Gambar Restoran
               ClipRRect(
@@ -102,7 +133,6 @@ class _RestaurantCardState extends State<RestaurantCard> {
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       width: 120,
-                      height: double.infinity,
                       color: Colors.grey[300],
                       child: const Icon(Icons.restaurant,
                           color: Colors.grey, size: 50),
@@ -126,7 +156,6 @@ class _RestaurantCardState extends State<RestaurantCard> {
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
-                          fontFamily: 'Montserrat',
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -137,7 +166,6 @@ class _RestaurantCardState extends State<RestaurantCard> {
                         widget.restaurant.location,
                         style: const TextStyle(
                           fontSize: 12,
-                          fontFamily: 'Montserrat',
                           color: Colors.grey,
                         ),
                         maxLines: 1,
@@ -154,7 +182,6 @@ class _RestaurantCardState extends State<RestaurantCard> {
                             '${widget.restaurant.rating}/5',
                             style: const TextStyle(
                               fontSize: 14,
-                              fontFamily: 'Montserrat',
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -164,16 +191,13 @@ class _RestaurantCardState extends State<RestaurantCard> {
                   ),
                 ),
               ),
-              // Favorite Toggle
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: IconButton(
-                  icon: Icon(
-                    isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: isFavorite ? Colors.red : Colors.grey,
-                  ),
-                  onPressed: () => toggleFavorite(request),
+              // Favorite Button
+              IconButton(
+                icon: Icon(
+                  isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: isFavorite ? Colors.red : Colors.grey,
                 ),
+                onPressed: () => toggleFavorite(),
               ),
             ],
           ),

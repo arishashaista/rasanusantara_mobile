@@ -2,8 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:rasanusantara_mobile/card.dart';
-import 'package:rasanusantara_mobile/model.dart';
-import 'package:rasanusantara_mobile/Katalog/models/restaurant.dart';
+import 'package:rasanusantara_mobile/restaurant.dart';
 import 'package:rasanusantara_mobile/Katalog/screens/restaurant_detail_page.dart';
 
 class MenuPage extends StatefulWidget {
@@ -14,41 +13,42 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> {
-  List<ProductEntry> _allProducts = []; // Semua data restoran
-  List<ProductEntry> _searchResults = []; // Hasil pencarian
+  List<Restaurant> _allRestaurants = []; // Semua data restoran
+  List<Restaurant> _searchResults = []; // Hasil pencarian
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fetchProducts();
+    fetchRestaurants();
   }
 
   // Fetch data dari backend
-  Future<void> fetchProducts() async {
+  Future<void> fetchRestaurants() async {
     final url = Uri.parse('http://127.0.0.1:8000/json');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       List data = jsonDecode(response.body);
       setState(() {
-        _allProducts = data.map((e) => ProductEntry.fromJson(e)).toList();
+        _allRestaurants =
+            data.map((e) => Restaurant.fromJson(e)).toList(); // Parse data
         _isLoading = false;
       });
     } else {
-      throw Exception('Failed to load products');
+      throw Exception('Failed to load restaurants');
     }
   }
 
   // Fungsi untuk filter hasil pencarian
-  void _searchProducts(String query) {
+  void _searchRestaurants(String query) {
     if (query.isEmpty) {
       setState(() {
         _searchResults = [];
       });
     } else {
-      final results = _allProducts.where((product) {
-        final name = product.fields.name.toLowerCase();
+      final results = _allRestaurants.where((restaurant) {
+        final name = restaurant.name.toLowerCase();
         return name.contains(query.toLowerCase());
       }).toList();
       setState(() {
@@ -64,6 +64,7 @@ class _MenuPageState extends State<MenuPage> {
           ? const Center(child: CircularProgressIndicator())
           : Stack(
               children: [
+                // Gambar Background
                 Positioned(
                   top: 0,
                   left: 0,
@@ -92,8 +93,8 @@ class _MenuPageState extends State<MenuPage> {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            const BoxShadow(
+                          boxShadow: const [
+                            BoxShadow(
                               color: Colors.black12,
                               blurRadius: 5,
                               offset: Offset(0, 3),
@@ -101,7 +102,7 @@ class _MenuPageState extends State<MenuPage> {
                           ],
                         ),
                         child: TextField(
-                          onChanged: _searchProducts,
+                          onChanged: _searchRestaurants,
                           decoration: const InputDecoration(
                             hintText: 'Ingin makan apa hari ini?',
                             hintStyle: TextStyle(
@@ -116,7 +117,6 @@ class _MenuPageState extends State<MenuPage> {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 8),
 
                       // Hasil Pencarian
@@ -127,8 +127,8 @@ class _MenuPageState extends State<MenuPage> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              const BoxShadow(
+                            boxShadow: const [
+                              BoxShadow(
                                 color: Colors.black12,
                                 blurRadius: 5,
                                 offset: Offset(0, 3),
@@ -140,42 +140,36 @@ class _MenuPageState extends State<MenuPage> {
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: _searchResults.length,
                             itemBuilder: (context, index) {
-                              final product = _searchResults[index];
-
-                              // Navigasi ke halaman detail saat diklik
+                              final restaurant = _searchResults[index];
                               return ListTile(
                                 leading: ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: Image.network(
-                                    product.fields.image,
+                                    restaurant.image,
                                     width: 50,
                                     height: 50,
                                     fit: BoxFit.cover,
                                   ),
                                 ),
                                 title: Text(
-                                  product.fields.name,
+                                  restaurant.name,
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14,
                                     fontFamily: 'Montserrat',
                                   ),
-                                  maxLines:
-                                      1, // Batasi nama restoran menjadi 1 baris
-                                  overflow: TextOverflow
-                                      .ellipsis, // Tambahkan "..." jika teks melebihi 1 baris
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                                 subtitle: Text(
-                                  product.fields.location,
+                                  restaurant.location,
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.grey,
                                     fontFamily: 'Montserrat',
                                   ),
-                                  maxLines:
-                                      1, // Batasi alamat restoran menjadi 1 baris
-                                  overflow: TextOverflow
-                                      .ellipsis, // Tambahkan "..." jika teks melebihi 1 baris
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                                 onTap: () {
                                   Navigator.push(
@@ -183,16 +177,7 @@ class _MenuPageState extends State<MenuPage> {
                                     MaterialPageRoute(
                                       builder: (context) =>
                                           RestaurantDetailPage(
-                                        restaurant: Restaurant(
-                                          id: product.pk,
-                                          name: product.fields.name,
-                                          location: product.fields.location,
-                                          averagePrice:
-                                              product.fields.averagePrice,
-                                          rating: product.fields.rating,
-                                          image: product.fields.image,
-                                          menuItems: [],
-                                        ),
+                                        restaurant: restaurant,
                                       ),
                                     ),
                                   );
@@ -252,15 +237,15 @@ class _MenuPageState extends State<MenuPage> {
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: _allProducts.take(8).length,
+                          itemCount: _allRestaurants.take(8).length,
                           itemBuilder: (context, index) {
-                            final product = _allProducts[index];
+                            final restaurant = _allRestaurants[index];
                             return Container(
                               width: 200,
                               margin: const EdgeInsets.only(right: 16),
                               child: FavoriteProductCard(
-                                fields: product.fields,
-                                id: product.pk,
+                                restaurant:
+                                    restaurant, // Kirim objek Restaurant
                               ),
                             );
                           },

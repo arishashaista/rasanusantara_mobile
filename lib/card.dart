@@ -2,16 +2,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:rasanusantara_mobile/model.dart';
+import 'package:rasanusantara_mobile/restaurant.dart';
 
 class FavoriteProductCard extends StatefulWidget {
-  final Fields fields;
-  final String id; // Ubah tipe id ke String
+  final Restaurant restaurant; // Model Restaurant
 
   const FavoriteProductCard({
     Key? key,
-    required this.fields,
-    required this.id,
+    required this.restaurant,
   }) : super(key: key);
 
   @override
@@ -21,24 +19,59 @@ class FavoriteProductCard extends StatefulWidget {
 class _FavoriteProductCardState extends State<FavoriteProductCard> {
   bool isFavorite = false;
 
-  Future<void> toggleFavorite(CookieRequest request) async {
-    final url = 'http://127.0.0.1:8000/favorite/toggle-favorite/';
-    final response = await request.postJson(
-      url,
-      {'restaurant_id': widget.id}, // JSON payload
-    );
+  @override
+  void initState() {
+    super.initState();
+    checkFavoriteStatus();
+  }
 
-    if (response['success'] == true) {
-      setState(() {
-        isFavorite = response['status'] == 'favorited';
-      });
-    } else {
+  // Fungsi untuk mengecek apakah restoran sudah difavoritkan
+  Future<void> checkFavoriteStatus() async {
+    final request = Provider.of<CookieRequest>(context, listen: false);
+    final url = 'http://127.0.0.1:8000/favorite/json/';
+
+    try {
+      final response = await request.get(url);
+      if (response != null) {
+        setState(() {
+          // Periksa apakah restoran ini ada dalam daftar favorit
+          isFavorite = response.any(
+            (fav) => fav['id'] == widget.restaurant.id,
+          );
+        });
+      }
+    } catch (e) {
+      // Tangani error saat memeriksa status favorit
+      debugPrint('Error checking favorite status: $e');
+    }
+  }
+
+  // Fungsi untuk toggle favorit
+  Future<void> toggleFavorite() async {
+    final request = Provider.of<CookieRequest>(context, listen: false);
+    final url = 'http://127.0.0.1:8000/favorite/toggle-favorite/';
+
+    try {
+      final response = await request.postJson(
+        url,
+        jsonEncode({'restaurant_id': widget.restaurant.id}),
+      );
+
+      // Parse response as Map
+      if (response is Map<String, dynamic> && response['success'] == true) {
+        setState(() {
+          isFavorite = response['status'] == 'favorited';
+        });
+      } else {
+        throw Exception(response['message'] ?? 'Gagal mengubah status favorit');
+      }
+    } catch (e) {
       if (context.mounted) {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Gagal Mengubah Favorit'),
-            content: Text(response['message'] ?? 'Terjadi kesalahan'),
+            title: const Text('Kesalahan'),
+            content: Text('Gagal terhubung ke server: $e'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -53,8 +86,6 @@ class _FavoriteProductCardState extends State<FavoriteProductCard> {
 
   @override
   Widget build(BuildContext context) {
-    final request = Provider.of<CookieRequest>(context, listen: false);
-
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       elevation: 1,
@@ -64,14 +95,14 @@ class _FavoriteProductCardState extends State<FavoriteProductCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: widget.fields.image.isNotEmpty
+                child: widget.restaurant.image.isNotEmpty
                     ? ClipRRect(
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(8),
                           topRight: Radius.circular(8),
                         ),
                         child: Image.network(
-                          widget.fields.image,
+                          widget.restaurant.image,
                           fit: BoxFit.cover,
                           width: double.infinity,
                         ),
@@ -86,7 +117,7 @@ class _FavoriteProductCardState extends State<FavoriteProductCard> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  widget.fields.name,
+                  widget.restaurant.name,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Montserrat',
@@ -98,7 +129,7 @@ class _FavoriteProductCardState extends State<FavoriteProductCard> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0),
                 child: Text(
-                  widget.fields.location,
+                  widget.restaurant.location,
                   style: TextStyle(
                       color: Colors.grey.shade700,
                       fontFamily: 'Montserrat',
@@ -108,23 +139,22 @@ class _FavoriteProductCardState extends State<FavoriteProductCard> {
                 ),
               ),
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Row(
                   children: [
                     const Icon(Icons.star, color: Colors.orange, size: 14),
                     const SizedBox(width: 4),
                     Text(
-                      '${widget.fields.rating.toString()}/5',
+                      '${widget.restaurant.rating.toString()}/5',
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Montserrat',
-                          fontSize: 12),
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Montserrat',
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 8),
             ],
           ),
           Positioned(
@@ -132,28 +162,7 @@ class _FavoriteProductCardState extends State<FavoriteProductCard> {
             right: 8,
             child: InkWell(
               onTap: () async {
-                if (request.loggedIn) {
-                  await toggleFavorite(request);
-                } else {
-                  if (context.mounted) {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Tidak Dapat Menyukai'),
-                        content: const Text(
-                            'Anda harus login terlebih dahulu untuk menandai favorit.'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text('OK'),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                }
+                await toggleFavorite();
               },
               child: Icon(
                 Icons.favorite,

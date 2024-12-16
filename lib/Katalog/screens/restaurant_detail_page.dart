@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/restaurant.dart';
+import 'package:rasanusantara_mobile/restaurant.dart';
 
 class RestaurantDetailPage extends StatelessWidget {
   final Restaurant restaurant;
@@ -44,12 +44,12 @@ class RestaurantDetailPage extends StatelessWidget {
                   left: 10,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5),
+                      color: Colors.white,
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
                       icon: const Icon(Icons.arrow_back),
-                      color: Colors.white,
+                      color: Colors.orange,
                       onPressed: () => Navigator.pop(context),
                     ),
                   ),
@@ -65,33 +65,45 @@ class RestaurantDetailPage extends StatelessWidget {
                     restaurant.name,
                     style: const TextStyle(
                       fontSize: 24,
+                      fontFamily: 'Montserrat',
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
                     restaurant.location,
-                    style: TextStyle(color: Colors.grey[600]),
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontFamily: 'Montserrat',
+                    ),
                   ),
                   Row(
                     children: [
-                      const Icon(Icons.star, color: Colors.amber, size: 20),
-                      Text(' ${restaurant.rating}'),
-                      Text(' • Rp${restaurant.averagePrice}'),
+                      const Icon(Icons.star_rounded,
+                          color: Colors.amber, size: 20),
+                      Text(
+                        ' ${restaurant.rating}',
+                        style: TextStyle(fontFamily: 'Montserrat'),
+                      ),
+                      Text(
+                        ' • Rp${restaurant.averagePrice}',
+                        style: TextStyle(fontFamily: 'Montserrat'),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 20),
                   const Text(
                     'Daftar Menu',
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Montserrat'),
                   ),
                   const SizedBox(height: 8),
                   ...restaurant.menuItems
                       .map((item) => Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Text('• ${item.name}'),
+                            child: Text('• ${item.name}',
+                                style: TextStyle(fontFamily: 'Montserrat')),
                           ))
                       .toList(),
                   const SizedBox(height: 20),
@@ -104,7 +116,10 @@ class RestaurantDetailPage extends StatelessWidget {
                             backgroundColor: Colors.orange,
                             foregroundColor: Colors.white,
                           ),
-                          child: const Text('Reservasi'),
+                          child: const Text(
+                            'Reservasi',
+                            style: TextStyle(fontFamily: 'Montserrat'),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -125,7 +140,10 @@ class RestaurantDetailPage extends StatelessWidget {
                             backgroundColor: Colors.orange,
                             foregroundColor: Colors.white,
                           ),
-                          child: const Text('Review'),
+                          child: const Text(
+                            'Review',
+                            style: TextStyle(fontFamily: 'Montserrat'),
+                          ),
                         ),
                       ),
                     ],

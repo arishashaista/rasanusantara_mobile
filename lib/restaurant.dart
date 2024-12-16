@@ -27,23 +27,21 @@ class Restaurant {
 
   // Factory memperhatikan properti "fields"
   factory Restaurant.fromJson(Map<String, dynamic> json) {
-    final fields = json["fields"] ?? {}; // Ambil "fields"
-
     return Restaurant(
-      id: json["pk"] ?? "", // Ambil UUID dari "pk"
-      name: fields["name"] ?? "Nama Tidak Tersedia",
-      location: fields["location"] ?? "Lokasi Tidak Tersedia",
-      averagePrice: fields["average_price"] != null
-          ? int.tryParse(fields["average_price"].toString()) ?? 0
+      id: json["id"] ?? "", // Ambil "id" dari root JSON
+      name: json["name"] ?? "Nama Tidak Tersedia",
+      location: json["location"] ?? "Lokasi Tidak Tersedia",
+      averagePrice: json["average_price"] != null
+          ? int.tryParse(json["average_price"].toString()) ?? 0
           : 0, // Pastikan ke int
-      rating: fields["rating"] != null
-          ? double.tryParse(fields["rating"].toString()) ?? 0.0
+      rating: json["rating"] != null
+          ? double.tryParse(json["rating"].toString()) ?? 0.0
           : 0.0, // Pastikan ke double
-      image: fields["image"] ?? "https://via.placeholder.com/150",
-      menuItems: fields["menu_items"] != null
+      image: json["image"] ?? "https://via.placeholder.com/150",
+      menuItems: json["menu_items"] != null
           ? List<MenuItem>.from(
-              fields["menu_items"].map((x) => MenuItem.fromJson(x)))
-          : [], // Handle null menu_items
+              json["menu_items"].map((x) => MenuItem.fromJson(x)))
+          : [], // Ambil menu_items dari root JSON
     );
   }
 

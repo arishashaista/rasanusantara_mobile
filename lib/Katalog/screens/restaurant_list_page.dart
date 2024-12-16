@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import '../models/restaurant.dart';
+import 'package:rasanusantara_mobile/restaurant.dart';
 import '../screens/restaurant_card.dart';
 import '../screens/restaurant_detail_page.dart';
 
