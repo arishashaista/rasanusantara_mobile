@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../models/restaurant.dart';
 import '../screens/restaurant_card.dart';
 import '../screens/restaurant_detail_page.dart';
+import 'package:rasanusantara_mobile/model.dart';
 
 class RestaurantListPage extends StatefulWidget {
   const RestaurantListPage({super.key});
@@ -16,7 +17,8 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   final TextEditingController _searchController = TextEditingController();
 
   Future<List<Restaurant>> fetchRestaurants(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/json/'); //nanti sesuain urlnya
+    final response =
+        await request.get('http://127.0.0.1:8000/json/'); //nanti sesuain urlnya
     List<Restaurant> listRestaurant = [];
     for (var d in response) {
       if (d != null) {
@@ -43,7 +45,8 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Row(
               children: [
                 Expanded(

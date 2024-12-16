@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rasanusantara_mobile/menu.dart';
+import 'package:rasanusantara_mobile/home.dart';
 import 'package:rasanusantara_mobile/navbar.dart';
 import 'package:rasanusantara_mobile/profileandfavorite.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:rasanusantara_mobile/menu.dart';
+import 'package:rasanusantara_mobile/Katalog/screens/restaurant_list_page.dart';
+import 'package:rasanusantara_mobile/home.dart';
 import 'package:rasanusantara_mobile/profileandfavorite.dart';
 import 'package:rasanusantara_mobile/authentication/screens/login.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -27,7 +28,7 @@ class _NavbarState extends State<Navbar> {
     // Daftar halaman yang akan ditampilkan
     final pages = [
       const MenuPage(), // index 0: Home (MenuPage)
-      Container(), // index 1: Restaurant (placeholder)
+      const RestaurantListPage(), // index 1: Restaurant (placeholder)
       Container(), // index 2: Calendar (placeholder)
       profilePage, // index 3: Profile Page
     ];

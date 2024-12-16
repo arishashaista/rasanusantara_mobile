@@ -8,7 +8,7 @@ String productEntryToJson(List<ProductEntry> data) =>
 
 class ProductEntry {
   String model;
-  String pk;
+  String pk; // UUID tetap sebagai String
   Fields fields;
 
   ProductEntry({
@@ -19,7 +19,7 @@ class ProductEntry {
 
   factory ProductEntry.fromJson(Map<String, dynamic> json) => ProductEntry(
         model: json["model"] ?? '',
-        pk: json["pk"] ?? '',
+        pk: json["pk"] ?? '', // Pastikan UUID ditangani sebagai String
         fields: Fields.fromJson(json["fields"] ?? {}),
       );
 
@@ -46,26 +46,22 @@ class Fields {
   });
 
   factory Fields.fromJson(Map<String, dynamic> json) {
-    // Coba konversi price_usd ke int
+    // Parsing harga sebagai integer
     int parsedPrice = 0;
-    if (json["price_usd"] != null) {
-      if (json["price_usd"] is int) {
-        // Jika memang sudah int, langsung assign
-        parsedPrice = json["price_usd"];
+    if (json["average_price"] != null) {
+      if (json["average_price"] is int) {
+        parsedPrice = json["average_price"];
       } else {
-        // Jika berupa string, coba parse
-        parsedPrice = int.tryParse(json["price_usd"].toString()) ?? 0;
+        parsedPrice = int.tryParse(json["average_price"].toString()) ?? 0;
       }
     }
 
-    // Coba konversi rating ke double
+    // Parsing rating sebagai double
     double parsedRating = 0.0;
     if (json["rating"] != null) {
       if (json["rating"] is num) {
-        // Jika langsung numerik, mudah
         parsedRating = (json["rating"] as num).toDouble();
       } else {
-        // Jika string, parse ke double
         parsedRating = double.tryParse(json["rating"].toString()) ?? 0.0;
       }
     }
