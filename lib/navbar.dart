@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:rasanusantara_mobile/Katalog/screens/restaurant_list_page.dart';
-import 'package:rasanusantara_mobile/home.dart';
-import 'package:rasanusantara_mobile/profileandfavorite.dart';
-import 'package:rasanusantara_mobile/authentication/screens/login.dart';
-import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:rasanusantara_mobile/home.dart';
+import 'package:rasanusantara_mobile/favorite/profileandfavorite.dart';
+import 'package:rasanusantara_mobile/authentication/screens/login.dart';
+import 'package:rasanusantara_mobile/Katalog/screens/restaurant_list_page.dart'; // Import halaman Menu
 
 class Navbar extends StatefulWidget {
   const Navbar({super.key});
@@ -14,77 +14,55 @@ class Navbar extends StatefulWidget {
 }
 
 class _NavbarState extends State<Navbar> {
-  int selectedIndex = 0;
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
 
-    // Tentukan halaman profile berdasarkan status login
-    final profilePage = request.loggedIn
-        ? const ProfileFavorite() // Sudah login
-        : const LoginPage(); // Belum login, arahkan ke halaman login
-
-    // Daftar halaman yang akan ditampilkan
-    final pages = [
-      const MenuPage(), // index 0: Home (MenuPage)
-      const RestaurantListPage(), // index 1: Restaurant (placeholder)
-      Container(), // index 2: Calendar (placeholder)
-      profilePage, // index 3: Profile Page
+    final List<Widget> pages = [
+      const MenuPage(), // Home Page
+      const RestaurantListPage(), // Menu Page
+      Container(), // Placeholder untuk Kalender
+      request.loggedIn ? const ProfileFavorite() : const LoginPage(), // Profile
     ];
 
     void _onItemTapped(int index) {
       setState(() {
-        selectedIndex = index;
+        _selectedIndex = index;
       });
     }
 
     return Scaffold(
-      body: pages[selectedIndex],
-      bottomNavigationBar: Container(
-        height: 70,
-        decoration: BoxDecoration(
-          color: Colors.brown[900],
-        ),
-        child: SafeArea(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              IconButton(
-                iconSize: 30,
-                icon: Icon(
-                  Icons.home_rounded,
-                  color: selectedIndex == 0 ? Colors.orange : Colors.white,
-                ),
-                onPressed: () => _onItemTapped(0),
-              ),
-              IconButton(
-                iconSize: 30,
-                icon: Icon(
-                  Icons.restaurant_menu_rounded,
-                  color: selectedIndex == 1 ? Colors.orange : Colors.white,
-                ),
-                onPressed: () => _onItemTapped(1),
-              ),
-              IconButton(
-                iconSize: 30,
-                icon: Icon(
-                  Icons.calendar_month_rounded,
-                  color: selectedIndex == 2 ? Colors.orange : Colors.white,
-                ),
-                onPressed: () => _onItemTapped(2),
-              ),
-              IconButton(
-                iconSize: 30,
-                icon: Icon(
-                  Icons.person_2_rounded,
-                  color: selectedIndex == 3 ? Colors.orange : Colors.white,
-                ),
-                onPressed: () => _onItemTapped(3),
-              ),
-            ],
+      body: pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        selectedItemColor: Colors.orange,
+        unselectedItemColor: Colors.white,
+        backgroundColor: Colors.brown[900], // Warna background navbar coklat
+        type: BottomNavigationBarType.fixed, // Hindari efek shifting
+        showSelectedLabels: false, // Hilangkan label saat item dipilih
+        showUnselectedLabels: false, // Hilangkan label saat item tidak dipilih
+        iconSize: 30, // Ukuran ikon diperbesar, sesuaikan dengan kebutuhan
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_rounded),
+            label: '',
           ),
-        ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.restaurant_menu_rounded),
+            label: '',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_month_rounded),
+            label: '',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_2_rounded),
+            label: '',
+          ),
+        ],
       ),
     );
   }

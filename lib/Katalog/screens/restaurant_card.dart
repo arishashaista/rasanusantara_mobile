@@ -27,7 +27,7 @@ class _RestaurantCardState extends State<RestaurantCard> {
     checkFavoriteStatus();
   }
 
-  // **1. Cek Status Favorit dari Backend**
+  // Fungsi mengecek status favorit
   Future<void> checkFavoriteStatus() async {
     final request = Provider.of<CookieRequest>(context, listen: false);
     final url = 'http://127.0.0.1:8000/favorite/json/';
@@ -46,8 +46,16 @@ class _RestaurantCardState extends State<RestaurantCard> {
     }
   }
 
+  // Fungsi toggle favorit
   Future<void> toggleFavorite() async {
     final request = Provider.of<CookieRequest>(context, listen: false);
+
+    if (!request.loggedIn) {
+      // Jika belum login, tampilkan peringatan
+      _showLoginAlert();
+      return;
+    }
+
     final url = 'http://127.0.0.1:8000/favorite/toggle-favorite/';
 
     try {
@@ -56,7 +64,6 @@ class _RestaurantCardState extends State<RestaurantCard> {
         jsonEncode({'restaurant_id': widget.restaurant.id}),
       );
 
-      // Parse response as Map
       if (response is Map<String, dynamic> && response['success'] == true) {
         setState(() {
           isFavorite = response['status'] == 'favorited';
@@ -66,24 +73,12 @@ class _RestaurantCardState extends State<RestaurantCard> {
       }
     } catch (e) {
       if (context.mounted) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Kesalahan'),
-            content: Text('Gagal terhubung ke server: $e'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
+        _showErrorDialog('Gagal terhubung ke server: $e');
       }
     }
   }
 
-  // **3. Tampilkan Alert Jika Belum Login**
+  // Fungsi menampilkan alert jika belum login
   void _showLoginAlert() {
     showDialog(
       context: context,
@@ -101,10 +96,25 @@ class _RestaurantCardState extends State<RestaurantCard> {
     );
   }
 
+  // Fungsi menampilkan error dialog
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Kesalahan'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final request = context.watch<CookieRequest>();
-
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       shape: RoundedRectangleBorder(
@@ -115,7 +125,6 @@ class _RestaurantCardState extends State<RestaurantCard> {
         onTap: widget.onTap,
         borderRadius: BorderRadius.circular(12),
         child: SizedBox(
-          width: double.infinity,
           height: 100,
           child: Row(
             children: [
@@ -127,12 +136,12 @@ class _RestaurantCardState extends State<RestaurantCard> {
                 ),
                 child: Image.network(
                   widget.restaurant.image,
-                  width: 120,
+                  width: 110,
                   height: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      width: 120,
+                      width: 110,
                       color: Colors.grey[300],
                       child: const Icon(Icons.restaurant,
                           color: Colors.grey, size: 50),
@@ -140,39 +149,67 @@ class _RestaurantCardState extends State<RestaurantCard> {
                   },
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               // Detail Restoran
               Expanded(
                 child: Padding(
                   padding:
-                      const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Nama Restoran
                       Text(
                         widget.restaurant.name,
                         style: const TextStyle(
                           fontSize: 16,
+                          fontFamily: 'Montserrat',
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
-                      // Lokasi Restoran
                       Text(
                         widget.restaurant.location,
                         style: const TextStyle(
                           fontSize: 12,
+                          fontFamily: 'Montserrat',
                           color: Colors.grey,
                         ),
-                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 8),
-                      // Rating Restoran
+                      if (widget.restaurant.menuItems.isNotEmpty &&
+                          widget
+                              .restaurant.menuItems.first.categories.isNotEmpty)
+                        Wrap(
+                          spacing: 6, // Spasi antar kategori
+                          runSpacing:
+                              4, // Spasi antar baris kategori jika lebih dari satu baris
+                          children: widget.restaurant.menuItems.first.categories
+                              .map((category) {
+                            return Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.orange.shade200,
+                                    Colors.orange
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                category,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       Row(
                         children: [
                           const Icon(Icons.star_rounded,
@@ -181,7 +218,8 @@ class _RestaurantCardState extends State<RestaurantCard> {
                           Text(
                             '${widget.restaurant.rating}/5',
                             style: const TextStyle(
-                              fontSize: 14,
+                              fontSize: 12,
+                              fontFamily: 'Montserrat',
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -191,13 +229,13 @@ class _RestaurantCardState extends State<RestaurantCard> {
                   ),
                 ),
               ),
-              // Favorite Button
+              // Tombol Favorit
               IconButton(
                 icon: Icon(
                   isFavorite ? Icons.favorite : Icons.favorite_border,
                   color: isFavorite ? Colors.red : Colors.grey,
                 ),
-                onPressed: () => toggleFavorite(),
+                onPressed: toggleFavorite,
               ),
             ],
           ),

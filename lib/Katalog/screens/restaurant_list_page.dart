@@ -14,13 +14,35 @@ class RestaurantListPage extends StatefulWidget {
 
 class _RestaurantListPageState extends State<RestaurantListPage> {
   final TextEditingController _searchController = TextEditingController();
-  List<Restaurant> _allRestaurants = []; // Semua restoran
-  List<Restaurant> _filteredRestaurants = []; // Hasil pencarian
+  List<Restaurant> _allRestaurants = [];
+  List<Restaurant> _filteredRestaurants = [];
   bool _isLoading = true;
 
-  String _selectedFilter = "Semua Restoran"; // Filter aktif
+  final List<String> _categories = [
+    "Semua Kategori",
+    "Gudeg",
+    "Oseng",
+    "Bakpia",
+    "Sate",
+    "Sego Gurih",
+    "Wedang",
+    "Lontong",
+    "Rujak Cingur",
+    "Mangut Lele",
+    "Ayam",
+    "Lainnya"
+  ];
 
-  // Fetch data restoran
+  final List<String> _sortOptions = [
+    "Harga Tertinggi",
+    "Harga Terendah",
+    "Rating Tertinggi",
+    "Rating Terendah",
+  ];
+
+  String _selectedCategory = "Semua Kategori";
+  String _selectedSortOption = "Rating Tertinggi";
+
   Future<void> fetchRestaurants(CookieRequest request) async {
     final response = await request.get('http://127.0.0.1:8000/json/');
     List<Restaurant> listRestaurant = [];
@@ -36,36 +58,31 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
     });
   }
 
-  // Fungsi untuk filter hasil pencarian
-  void _searchRestaurants(String query) {
+  void _applyFilters() {
     setState(() {
-      if (query.isEmpty) {
-        _filteredRestaurants = _allRestaurants; // Tampilkan semua jika kosong
-      } else {
-        _filteredRestaurants = _allRestaurants.where((restaurant) {
-          final name = restaurant.name.toLowerCase();
-          return name.contains(query.toLowerCase());
-        }).toList();
-      }
-    });
-  }
+      final query = _searchController.text.toLowerCase();
 
-  // Fungsi untuk mengurutkan data
-  void _sortRestaurants(String filter) {
-    setState(() {
-      _selectedFilter = filter;
-      if (filter == "Rating Tertinggi") {
-        _filteredRestaurants.sort((a, b) => b.rating.compareTo(a.rating));
-      } else if (filter == "Rating Terendah") {
-        _filteredRestaurants.sort((a, b) => a.rating.compareTo(b.rating));
-      } else if (filter == "Harga Tertinggi") {
+      // Filter berdasarkan pencarian dan kategori
+      _filteredRestaurants = _allRestaurants.where((restaurant) {
+        final matchesSearch = restaurant.name.toLowerCase().contains(query);
+        final matchesCategory = _selectedCategory == "Semua Kategori" ||
+            restaurant.menuItems.any(
+                (menuItem) => menuItem.categories.contains(_selectedCategory));
+
+        return matchesSearch && matchesCategory;
+      }).toList();
+
+      // Urutkan berdasarkan opsi yang dipilih
+      if (_selectedSortOption == "Harga Tertinggi") {
         _filteredRestaurants
             .sort((a, b) => b.averagePrice.compareTo(a.averagePrice));
-      } else if (filter == "Harga Terendah") {
+      } else if (_selectedSortOption == "Harga Terendah") {
         _filteredRestaurants
             .sort((a, b) => a.averagePrice.compareTo(b.averagePrice));
-      } else {
-        _filteredRestaurants = _allRestaurants;
+      } else if (_selectedSortOption == "Rating Tertinggi") {
+        _filteredRestaurants.sort((a, b) => b.rating.compareTo(a.rating));
+      } else if (_selectedSortOption == "Rating Terendah") {
+        _filteredRestaurants.sort((a, b) => a.rating.compareTo(b.rating));
       }
     });
   }
@@ -73,19 +90,8 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.orange,
-        title: const Text(
-          "Daftar Restoran",
-          style: TextStyle(
-            fontFamily: 'Montserrat',
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -93,7 +99,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                 // Search Bar
                 Container(
                   margin: const EdgeInsets.only(
-                      top: 16, left: 16, right: 16, bottom: 8),
+                      top: 20, left: 16, right: 16, bottom: 8),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24),
@@ -107,11 +113,9 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                   ),
                   child: TextField(
                     controller: _searchController,
-                    onChanged: _searchRestaurants, // Fungsi filter
+                    onChanged: (value) => _applyFilters(),
                     decoration: const InputDecoration(
                       hintText: 'Ingin makan apa hari ini?',
-                      hintStyle:
-                          TextStyle(fontSize: 14, fontFamily: 'Montserrat'),
                       border: InputBorder.none,
                       prefixIcon: Icon(Icons.search, color: Colors.orange),
                       contentPadding:
@@ -120,79 +124,88 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                   ),
                 ),
 
-                // Dropdown Filter dan Tombol Semua Restoran
+                // Dropdown Kategori dan Filter
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 8.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
                     children: [
+                      // Dropdown Kategori dengan Tampilan Oranye dan Scroll
                       Expanded(
-                        child: DropdownButtonFormField<String>(
-                          value: _selectedFilter,
-                          items: const [
-                            DropdownMenuItem(
-                              value: "Semua Restoran",
-                              child: Text("Semua Restoran"),
-                            ),
-                            DropdownMenuItem(
-                              value: "Rating Tertinggi",
-                              child: Text("Rating Tertinggi"),
-                            ),
-                            DropdownMenuItem(
-                              value: "Rating Terendah",
-                              child: Text("Rating Terendah"),
-                            ),
-                            DropdownMenuItem(
-                              value: "Harga Tertinggi",
-                              child: Text("Harga Tertinggi"),
-                            ),
-                            DropdownMenuItem(
-                              value: "Harga Terendah",
-                              child: Text("Harga Terendah"),
-                            ),
-                          ],
-                          onChanged: (value) {
-                            if (value != null) {
-                              _sortRestaurants(value);
-                            }
-                          },
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor:
-                                Colors.orange.shade100, // Warna background
-                            contentPadding:
-                                const EdgeInsets.symmetric(horizontal: 16),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide.none,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.orange, // Warna oranye
+                            borderRadius:
+                                BorderRadius.circular(24), // Rounded corners
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              value: _selectedCategory,
+                              icon: const Icon(Icons.arrow_drop_down,
+                                  color: Colors.white),
+                              style: const TextStyle(
+                                fontFamily: 'Montserrat',
+                                fontSize: 14,
+                                color: Colors.white, // Teks putih
+                              ),
+                              dropdownColor: Colors.orange.shade100,
+                              items: _categories.map((category) {
+                                return DropdownMenuItem<String>(
+                                  value: category,
+                                  child: Text(category),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  setState(() {
+                                    _selectedCategory = value;
+                                    _applyFilters();
+                                  });
+                                }
+                              },
+                              menuMaxHeight:
+                                  200, // Maksimum 4 item dengan scroll
                             ),
                           ),
-                          dropdownColor:
-                              Colors.orange.shade100, // Dropdown menu
-                          style: const TextStyle(
-                            color: Colors.black87,
-                            fontFamily: 'Montserrat',
-                          ),
-                          icon: const Icon(Icons.arrow_drop_down,
-                              color: Colors.orange),
                         ),
                       ),
                       const SizedBox(width: 8),
+
+                      // Dropdown Filter dengan Tampilan Oranye
                       Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            // Tampilkan semua restoran
-                            setState(() {
-                              _filteredRestaurants = _allRestaurants;
-                              _searchController.clear();
-                              _selectedFilter = "Semua Restoran";
-                            });
-                          },
-                          icon: const Icon(Icons.restaurant),
-                          label: const Text('Semua Restoran'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange,
-                            foregroundColor: Colors.white,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.orange, // Warna oranye
+                            borderRadius:
+                                BorderRadius.circular(24), // Rounded corners
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              value: _selectedSortOption,
+                              icon: const Icon(Icons.arrow_drop_down,
+                                  color: Colors.white),
+                              style: const TextStyle(
+                                fontFamily: 'Montserrat',
+                                fontSize: 14,
+                                color: Colors.white, // Teks putih
+                              ),
+                              dropdownColor: Colors.orange.shade100,
+                              items: _sortOptions.map((option) {
+                                return DropdownMenuItem<String>(
+                                  value: option,
+                                  child: Text(option),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                if (value != null) {
+                                  setState(() {
+                                    _selectedSortOption = value;
+                                    _applyFilters();
+                                  });
+                                }
+                              },
+                            ),
                           ),
                         ),
                       ),

@@ -90,6 +90,36 @@ class RestaurantDetailPage extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 2),
+                  if (restaurant.menuItems.isNotEmpty &&
+                      restaurant.menuItems.first.categories.isNotEmpty)
+                    Wrap(
+                      spacing: 6, // Spasi antar kategori
+                      runSpacing:
+                          4, // Spasi antar baris kategori jika lebih dari satu baris
+                      children:
+                          restaurant.menuItems.first.categories.map((category) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Colors.orange.shade200, Colors.orange],
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            category,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontFamily: 'Montserrat',
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
                   const SizedBox(height: 20),
                   const Text(
                     'Daftar Menu',

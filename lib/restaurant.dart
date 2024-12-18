@@ -1,11 +1,3 @@
-import 'dart:convert';
-
-List<Restaurant> restaurantFromJson(String str) =>
-    List<Restaurant>.from(json.decode(str).map((x) => Restaurant.fromJson(x)));
-
-String restaurantToJson(List<Restaurant> data) =>
-    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
-
 class Restaurant {
   String id; // UUID dari "pk"
   String name; // Diambil dari fields["name"]
@@ -59,19 +51,25 @@ class Restaurant {
 class MenuItem {
   String id; // UUID atau identifier
   String name; // Nama menu item
+  List<String> categories; // Daftar kategori menu
 
   MenuItem({
     required this.id,
     required this.name,
+    required this.categories,
   });
 
   factory MenuItem.fromJson(Map<String, dynamic> json) => MenuItem(
         id: json["id"] ?? "",
         name: json["name"] ?? "Menu Tidak Tersedia",
+        categories: json["categories"] != null
+            ? List<String>.from(json["categories"])
+            : [], // Ambil daftar kategori
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
+        "categories": categories,
       };
 }

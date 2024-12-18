@@ -52,13 +52,17 @@ class _MenuPageState extends State<MenuPage> {
         return name.contains(query.toLowerCase());
       }).toList();
       setState(() {
-        _searchResults = results.take(2).toList(); // Batasi ke 5 hasil
+        _searchResults = results.take(2).toList();
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Sort restoran berdasarkan rating tertinggi
+    final topRatedRestaurants = List<Restaurant>.from(_allRestaurants)
+      ..sort((a, b) => b.rating.compareTo(a.rating));
+
     return Scaffold(
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -89,6 +93,7 @@ class _MenuPageState extends State<MenuPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Search Bar
+// Search Bar
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -103,17 +108,26 @@ class _MenuPageState extends State<MenuPage> {
                         ),
                         child: TextField(
                           onChanged: _searchRestaurants,
-                          decoration: const InputDecoration(
+                          textAlign: TextAlign.left,
+                          decoration: InputDecoration(
                             hintText: 'Ingin makan apa hari ini?',
-                            hintStyle: TextStyle(
+                            hintStyle: const TextStyle(
                               fontSize: 14,
                               fontFamily: 'Montserrat',
                             ),
                             border: InputBorder.none,
-                            prefixIcon:
-                                Icon(Icons.search, color: Colors.orange),
-                            contentPadding: EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 14),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
+                            ),
+                            suffixIcon: Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 10.0), // Tambahkan padding kanan
+                              child: const Icon(
+                                Icons.search,
+                                color: Colors.orange,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -237,9 +251,9 @@ class _MenuPageState extends State<MenuPage> {
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: _allRestaurants.take(8).length,
+                          itemCount: topRatedRestaurants.take(8).length,
                           itemBuilder: (context, index) {
-                            final restaurant = _allRestaurants[index];
+                            final restaurant = topRatedRestaurants[index];
                             return Container(
                               width: 200,
                               margin: const EdgeInsets.only(right: 16),
