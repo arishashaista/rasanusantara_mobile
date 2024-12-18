@@ -1,13 +1,114 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:rasanusantara_mobile/restaurant.dart';
 
-class RestaurantDetailPage extends StatelessWidget {
+class RestaurantDetailPage extends StatefulWidget {
   final Restaurant restaurant;
 
   const RestaurantDetailPage({
     Key? key,
     required this.restaurant,
   }) : super(key: key);
+
+  @override
+  State<RestaurantDetailPage> createState() => _RestaurantDetailPageState();
+}
+
+class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
+  bool isFavorite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    checkFavoriteStatus();
+  }
+
+  Future<void> checkFavoriteStatus() async {
+    final request = Provider.of<CookieRequest>(context, listen: false);
+    final url = 'http://127.0.0.1:8000/favorite/json/';
+
+    try {
+      final response = await request.get(url);
+      if (response != null) {
+        setState(() {
+          isFavorite = response.any(
+            (fav) => fav['id'] == widget.restaurant.id,
+          );
+        });
+      }
+    } catch (e) {
+      debugPrint('Error fetching favorite status: $e');
+    }
+  }
+
+  // Fungsi toggle favorit
+  Future<void> toggleFavorite() async {
+    final request = Provider.of<CookieRequest>(context, listen: false);
+
+    if (!request.loggedIn) {
+      // Jika belum login, tampilkan peringatan
+      _showLoginAlert();
+      return;
+    }
+
+    final url = 'http://127.0.0.1:8000/favorite/toggle-favorite/';
+
+    try {
+      final response = await request.postJson(
+        url,
+        jsonEncode({'restaurant_id': widget.restaurant.id}),
+      );
+
+      if (response is Map<String, dynamic> && response['success'] == true) {
+        setState(() {
+          isFavorite = response['status'] == 'favorited';
+        });
+      } else {
+        throw Exception(response['message'] ?? 'Gagal mengubah status favorit');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        _showErrorDialog('Gagal terhubung ke server: $e');
+      }
+    }
+  }
+
+  // Fungsi menampilkan alert jika belum login
+  void _showLoginAlert() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Belum Login'),
+        content:
+            const Text('Silakan login terlebih dahulu untuk menandai favorit.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Fungsi menampilkan error dialog
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Kesalahan'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +123,7 @@ class RestaurantDetailPage extends StatelessWidget {
                   height: 200,
                   width: double.infinity,
                   child: Image.network(
-                    restaurant.image,
+                    widget.restaurant.image,
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
@@ -54,6 +155,23 @@ class RestaurantDetailPage extends StatelessWidget {
                     ),
                   ),
                 ),
+                Positioned(
+                  top: 40,
+                  right: 10,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? Colors.red : Colors.grey,
+                      ),
+                      onPressed: toggleFavorite,
+                    ),
+                  ),
+                ),
               ],
             ),
             Padding(
@@ -62,7 +180,7 @@ class RestaurantDetailPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    restaurant.name,
+                    widget.restaurant.name,
                     style: const TextStyle(
                       fontSize: 24,
                       fontFamily: 'Montserrat',
@@ -70,7 +188,7 @@ class RestaurantDetailPage extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    restaurant.location,
+                    widget.restaurant.location,
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontFamily: 'Montserrat',
@@ -81,24 +199,23 @@ class RestaurantDetailPage extends StatelessWidget {
                       const Icon(Icons.star_rounded,
                           color: Colors.amber, size: 20),
                       Text(
-                        ' ${restaurant.rating}',
+                        ' ${widget.restaurant.rating}',
                         style: TextStyle(fontFamily: 'Montserrat'),
                       ),
                       Text(
-                        ' • Rp${restaurant.averagePrice}',
+                        ' • Rp${widget.restaurant.averagePrice}',
                         style: TextStyle(fontFamily: 'Montserrat'),
                       ),
                     ],
                   ),
                   const SizedBox(height: 2),
-                  if (restaurant.menuItems.isNotEmpty &&
-                      restaurant.menuItems.first.categories.isNotEmpty)
+                  if (widget.restaurant.menuItems.isNotEmpty &&
+                      widget.restaurant.menuItems.first.categories.isNotEmpty)
                     Wrap(
-                      spacing: 6, // Spasi antar kategori
-                      runSpacing:
-                          4, // Spasi antar baris kategori jika lebih dari satu baris
-                      children:
-                          restaurant.menuItems.first.categories.map((category) {
+                      spacing: 6,
+                      runSpacing: 4,
+                      children: widget.restaurant.menuItems.first.categories
+                          .map((category) {
                         return Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 4),
@@ -129,7 +246,7 @@ class RestaurantDetailPage extends StatelessWidget {
                         fontFamily: 'Montserrat'),
                   ),
                   const SizedBox(height: 8),
-                  ...restaurant.menuItems
+                  ...widget.restaurant.menuItems
                       .map((item) => Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4),
                             child: Text('• ${item.name}',
@@ -155,17 +272,7 @@ class RestaurantDetailPage extends StatelessWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: () {
-                            // Navigator.push(
-                            //   // context,
-                            //   // MaterialPageRoute(
-                            //   //   builder: (context) => ReviewPage(
-                            //   //     restaurantName: restaurant.name,
-                            //   //     restaurantImage: restaurant.image,
-                            //   //   ),
-                            //   // ),
-                            // );
-                          },
+                          onPressed: () {},
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange,
                             foregroundColor: Colors.white,

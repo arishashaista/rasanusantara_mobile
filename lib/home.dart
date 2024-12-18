@@ -1,6 +1,6 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:rasanusantara_mobile/card.dart';
 import 'package:rasanusantara_mobile/restaurant.dart';
 import 'package:rasanusantara_mobile/Katalog/screens/restaurant_detail_page.dart';
@@ -13,8 +13,8 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> {
-  List<Restaurant> _allRestaurants = []; // Semua data restoran
-  List<Restaurant> _searchResults = []; // Hasil pencarian
+  List<Restaurant> _allRestaurants = [];
+  List<Restaurant> _searchResults = [];
   bool _isLoading = true;
 
   @override
@@ -23,7 +23,6 @@ class _MenuPageState extends State<MenuPage> {
     fetchRestaurants();
   }
 
-  // Fetch data dari backend
   Future<void> fetchRestaurants() async {
     final url = Uri.parse('http://127.0.0.1:8000/json');
     final response = await http.get(url);
@@ -31,8 +30,7 @@ class _MenuPageState extends State<MenuPage> {
     if (response.statusCode == 200) {
       List data = jsonDecode(response.body);
       setState(() {
-        _allRestaurants =
-            data.map((e) => Restaurant.fromJson(e)).toList(); // Parse data
+        _allRestaurants = data.map((e) => Restaurant.fromJson(e)).toList();
         _isLoading = false;
       });
     } else {
@@ -40,7 +38,6 @@ class _MenuPageState extends State<MenuPage> {
     }
   }
 
-  // Fungsi untuk filter hasil pencarian
   void _searchRestaurants(String query) {
     if (query.isEmpty) {
       setState(() {
@@ -59,21 +56,25 @@ class _MenuPageState extends State<MenuPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Sort restoran berdasarkan rating tertinggi
     final topRatedRestaurants = List<Restaurant>.from(_allRestaurants)
+      ..sort((a, b) => b.rating.compareTo(a.rating));
+
+    final gudegRestaurants = _allRestaurants
+        .where((restaurant) =>
+            restaurant.menuItems.isNotEmpty &&
+            restaurant.menuItems.first.categories.contains('Gudeg'))
+        .toList()
       ..sort((a, b) => b.rating.compareTo(a.rating));
 
     return Scaffold(
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : Stack(
-              children: [
-                // Gambar Background
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
+          : SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Bagian Background
+                  Container(
                     height: 250,
                     decoration: const BoxDecoration(
                       image: DecorationImage(
@@ -81,195 +82,200 @@ class _MenuPageState extends State<MenuPage> {
                         fit: BoxFit.cover,
                       ),
                     ),
-                  ),
-                ),
-
-                // Search Bar dan Hasil Pencarian
-                Positioned(
-                  top: MediaQuery.of(context).padding.top + 22,
-                  left: 16,
-                  right: 16,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Search Bar
-// Search Bar
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 5,
-                              offset: Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: TextField(
-                          onChanged: _searchRestaurants,
-                          textAlign: TextAlign.left,
-                          decoration: InputDecoration(
-                            hintText: 'Ingin makan apa hari ini?',
-                            hintStyle: const TextStyle(
-                              fontSize: 14,
-                              fontFamily: 'Montserrat',
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 14,
-                            ),
-                            suffixIcon: Padding(
-                              padding: const EdgeInsets.only(
-                                  right: 10.0), // Tambahkan padding kanan
-                              child: const Icon(
-                                Icons.search,
-                                color: Colors.orange,
-                              ),
-                            ),
-                          ),
-                        ),
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).padding.top + 16,
+                        left: 16,
+                        right: 16,
                       ),
-                      const SizedBox(height: 8),
-
-                      // Hasil Pencarian
-                      if (_searchResults.isNotEmpty)
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          margin: const EdgeInsets.only(bottom: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black12,
-                                blurRadius: 5,
-                                offset: Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: _searchResults.length,
-                            itemBuilder: (context, index) {
-                              final restaurant = _searchResults[index];
-                              return ListTile(
-                                leading: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.network(
-                                    restaurant.image,
-                                    width: 50,
-                                    height: 50,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                title: Text(
-                                  restaurant.name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    fontFamily: 'Montserrat',
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                subtitle: Text(
-                                  restaurant.location,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey,
-                                    fontFamily: 'Montserrat',
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          RestaurantDetailPage(
-                                        restaurant: restaurant,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                    ],
+                      child: _buildSearchBar(),
+                    ),
                   ),
-                ),
 
-                // Restoran Populer
-                Positioned(
-                  top: MediaQuery.of(context).padding.top + 260,
-                  left: 0,
-                  right: 0,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Restoran Populer',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Montserrat',
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {},
-                              style: TextButton.styleFrom(
-                                backgroundColor: Colors.orange,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                              ),
-                              child: const Text(
-                                'Lainnya',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Montserrat',
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        height: 180,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: topRatedRestaurants.take(8).length,
-                          itemBuilder: (context, index) {
-                            final restaurant = topRatedRestaurants[index];
-                            return Container(
-                              width: 200,
-                              margin: const EdgeInsets.only(right: 16),
-                              child: FavoriteProductCard(
-                                restaurant:
-                                    restaurant, // Kirim objek Restaurant
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                  // Bagian Hasil Pencarian
+                  if (_searchResults.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: _buildSearchResults(),
+                    ),
+
+                  // Restoran Populer
+                  _buildSectionHeader('Restoran Populer'),
+                  _buildRestaurantList(topRatedRestaurants.take(8).toList()),
+
+                  // Restoran Gudeg
+                  _buildSectionHeader('Restoran Gudeg'),
+                  _buildRestaurantList(gudegRestaurants.take(8).toList()),
+                ],
+              ),
             ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Align(
+      alignment: Alignment.center, // Menempatkan di tengah horizontal
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.85, // Lebar 85% dari layar
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 8,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: TextField(
+          onChanged: _searchRestaurants,
+          textAlignVertical: TextAlignVertical.center,
+          decoration: InputDecoration(
+            hintText: 'Ingin makan apa hari ini?',
+            hintStyle: const TextStyle(
+              fontSize: 14,
+              fontFamily: 'Montserrat',
+              color: Colors.grey,
+            ),
+            border: InputBorder.none,
+            prefixIcon: const Icon(
+              Icons.search,
+              color: Colors.orange,
+              size: 24,
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 14,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Montserrat',
+            ),
+          ),
+          TextButton(
+            onPressed: () {},
+            style: TextButton.styleFrom(
+              backgroundColor: Colors.orange,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            child: const Text(
+              'Lainnya',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Montserrat',
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRestaurantList(List<Restaurant> restaurants) {
+    return SizedBox(
+      height: 180,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: restaurants.length,
+        itemBuilder: (context, index) {
+          final restaurant = restaurants[index];
+          return Container(
+            width: 200,
+            margin: const EdgeInsets.only(right: 16),
+            child: FavoriteProductCard(
+              restaurant: restaurant,
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildSearchResults() {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: _searchResults.length,
+        itemBuilder: (context, index) {
+          final restaurant = _searchResults[index];
+          return ListTile(
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                restaurant.image,
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
+              ),
+            ),
+            title: Text(
+              restaurant.name,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                fontFamily: 'Montserrat',
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            subtitle: Text(
+              restaurant.location,
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+                fontFamily: 'Montserrat',
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RestaurantDetailPage(
+                    restaurant: restaurant,
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
