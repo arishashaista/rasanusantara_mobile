@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:rasanusantara_mobile/restaurant.dart';
+import 'package:rasanusantara_mobile/review/screens/review_page.dart'; // Import halaman Review
 
 class RestaurantDetailPage extends StatefulWidget {
   final Restaurant restaurant;
@@ -43,12 +44,10 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
     }
   }
 
-  // Fungsi toggle favorit
   Future<void> toggleFavorite() async {
     final request = Provider.of<CookieRequest>(context, listen: false);
 
     if (!request.loggedIn) {
-      // Jika belum login, tampilkan peringatan
       _showLoginAlert();
       return;
     }
@@ -75,7 +74,6 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
     }
   }
 
-  // Fungsi menampilkan alert jika belum login
   void _showLoginAlert() {
     showDialog(
       context: context,
@@ -93,7 +91,6 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
     );
   }
 
-  // Fungsi menampilkan error dialog
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
@@ -272,7 +269,17 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ReviewPage(
+                                  restaurantName: widget.restaurant.name,
+                                  restaurantImage: widget.restaurant.image,
+                                ),
+                              ),
+                            );
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange,
                             foregroundColor: Colors.white,
