@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rasanusantara_mobile/favorite/favorite_provider.dart';
 import 'package:rasanusantara_mobile/home.dart';
 import 'package:rasanusantara_mobile/navbar.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -7,8 +8,15 @@ import 'package:rasanusantara_mobile/authentication/screens/login.dart';
 
 void main() {
   runApp(
-    Provider(
-      create: (context) => CookieRequest(),
+    MultiProvider(
+      providers: [
+        Provider<CookieRequest>(
+          create: (_) => CookieRequest(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => FavoriteProvider(),
+        ),
+      ],
       child: const MyApp(),
     ),
   );

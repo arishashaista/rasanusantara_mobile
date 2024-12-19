@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:rasanusantara_mobile/restaurant.dart';
 import '../screens/restaurant_card.dart';
 import '../screens/restaurant_detail_page.dart';
+import '/favorite/favorite_provider.dart';
 
 class RestaurantListPage extends StatefulWidget {
   const RestaurantListPage({super.key});
@@ -44,25 +45,31 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   String _selectedSortOption = "Rating Tertinggi";
 
   Future<void> fetchRestaurants(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/json/');
-    List<Restaurant> listRestaurant = [];
-    for (var d in response) {
-      if (d != null) {
-        listRestaurant.add(Restaurant.fromJson(d));
+    try {
+      final response = await request.get('http://127.0.0.1:8000/json/');
+      List<Restaurant> listRestaurant = [];
+      for (var d in response) {
+        if (d != null) {
+          listRestaurant.add(Restaurant.fromJson(d));
+        }
       }
+      setState(() {
+        _allRestaurants = listRestaurant;
+        _filteredRestaurants = listRestaurant;
+        _isLoading = false;
+      });
+    } catch (error) {
+      setState(() {
+        _isLoading = false;
+      });
+      _showErrorDialog('Gagal memuat restoran. Periksa koneksi Anda.');
     }
-    setState(() {
-      _allRestaurants = listRestaurant;
-      _filteredRestaurants = listRestaurant;
-      _isLoading = false;
-    });
   }
 
   void _applyFilters() {
     setState(() {
       final query = _searchController.text.toLowerCase();
 
-      // Filter berdasarkan pencarian dan kategori
       _filteredRestaurants = _allRestaurants.where((restaurant) {
         final matchesSearch = restaurant.name.toLowerCase().contains(query);
         final matchesCategory = _selectedCategory == "Semua Kategori" ||
@@ -72,7 +79,6 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
         return matchesSearch && matchesCategory;
       }).toList();
 
-      // Urutkan berdasarkan opsi yang dipilih
       if (_selectedSortOption == "Harga Tertinggi") {
         _filteredRestaurants
             .sort((a, b) => b.averagePrice.compareTo(a.averagePrice));
@@ -87,6 +93,42 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
     });
   }
 
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final request = Provider.of<CookieRequest>(context, listen: false);
+      final favoriteProvider =
+          Provider.of<FavoriteProvider>(context, listen: false);
+
+      // Inisialisasi data favorit dan restoran
+      await favoriteProvider.initializeFavorites(request);
+      await fetchRestaurants(request);
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
@@ -96,7 +138,6 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                // Search Bar
                 Container(
                   margin: const EdgeInsets.only(
                       top: 20, left: 16, right: 16, bottom: 8),
@@ -123,102 +164,57 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                     ),
                   ),
                 ),
-
-                // Dropdown Kategori dan Filter
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
                     children: [
-                      // Dropdown Kategori dengan Tampilan Oranye dan Scroll
                       Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.orange, // Warna oranye
-                            borderRadius:
-                                BorderRadius.circular(24), // Rounded corners
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              value: _selectedCategory,
-                              icon: const Icon(Icons.arrow_drop_down,
-                                  color: Colors.white),
-                              style: const TextStyle(
-                                fontFamily: 'Montserrat',
-                                fontSize: 14,
-                                color: Colors.white, // Teks putih
-                              ),
-                              dropdownColor: Colors.orange.shade100,
-                              items: _categories.map((category) {
-                                return DropdownMenuItem<String>(
-                                  value: category,
-                                  child: Text(category),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                if (value != null) {
-                                  setState(() {
-                                    _selectedCategory = value;
-                                    _applyFilters();
-                                  });
-                                }
-                              },
-                              menuMaxHeight:
-                                  200, // Maksimum 4 item dengan scroll
-                            ),
-                          ),
+                        child: DropdownButton<String>(
+                          value: _selectedCategory,
+                          items: _categories.map((category) {
+                            return DropdownMenuItem(
+                              value: category,
+                              child: Text(category),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                _selectedCategory = value;
+                                _applyFilters();
+                              });
+                            }
+                          },
                         ),
                       ),
                       const SizedBox(width: 8),
-
-                      // Dropdown Filter dengan Tampilan Oranye
                       Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.orange, // Warna oranye
-                            borderRadius:
-                                BorderRadius.circular(24), // Rounded corners
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              value: _selectedSortOption,
-                              icon: const Icon(Icons.arrow_drop_down,
-                                  color: Colors.white),
-                              style: const TextStyle(
-                                fontFamily: 'Montserrat',
-                                fontSize: 14,
-                                color: Colors.white, // Teks putih
-                              ),
-                              dropdownColor: Colors.orange.shade100,
-                              items: _sortOptions.map((option) {
-                                return DropdownMenuItem<String>(
-                                  value: option,
-                                  child: Text(option),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                if (value != null) {
-                                  setState(() {
-                                    _selectedSortOption = value;
-                                    _applyFilters();
-                                  });
-                                }
-                              },
-                            ),
-                          ),
+                        child: DropdownButton<String>(
+                          value: _selectedSortOption,
+                          items: _sortOptions.map((option) {
+                            return DropdownMenuItem(
+                              value: option,
+                              child: Text(option),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                _selectedSortOption = value;
+                                _applyFilters();
+                              });
+                            }
+                          },
                         ),
                       ),
                     ],
                   ),
                 ),
-
-                // List Hasil Pencarian
                 Expanded(
                   child: _filteredRestaurants.isEmpty
                       ? const Center(
                           child: Text(
-                            "Belum ada restoran yang tersedia.",
+                            "Tidak ada restoran yang dicari.",
                             style: TextStyle(
                               color: Color(0xff59A5D8),
                               fontSize: 20,
@@ -245,12 +241,5 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
               ],
             ),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    final request = Provider.of<CookieRequest>(context, listen: false);
-    fetchRestaurants(request);
   }
 }

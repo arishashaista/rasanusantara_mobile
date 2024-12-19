@@ -2,7 +2,7 @@ class Restaurant {
   String id; // UUID dari "pk"
   String name; // Diambil dari fields["name"]
   String location; // Diambil dari fields["location"]
-  int averagePrice; // Diambil dari fields["average_price"]
+  double averagePrice; // Diambil dari fields["average_price"]
   double rating; // Diambil dari fields["rating"]
   String image; // Diambil dari fields["image"]
   List<MenuItem> menuItems; // Bisa kosong
@@ -24,8 +24,9 @@ class Restaurant {
       name: json["name"] ?? "Nama Tidak Tersedia",
       location: json["location"] ?? "Lokasi Tidak Tersedia",
       averagePrice: json["average_price"] != null
-          ? int.tryParse(json["average_price"].toString()) ?? 0
-          : 0, // Pastikan ke int
+          ? double.tryParse(json["average_price"].toString()) ?? 0.0
+          : 0.0,
+
       rating: json["rating"] != null
           ? double.tryParse(json["rating"].toString()) ?? 0.0
           : 0.0, // Pastikan ke double
