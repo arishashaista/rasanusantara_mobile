@@ -42,9 +42,6 @@ class _LoginPageState extends State<LoginPage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
@@ -61,9 +58,9 @@ class _LoginPageState extends State<LoginPage> {
                   const Text(
                     'Login',
                     style: TextStyle(
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.bold,
-                    ),
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Montserrat'),
                   ),
                   const SizedBox(height: 30.0),
                   TextField(
@@ -71,6 +68,8 @@ class _LoginPageState extends State<LoginPage> {
                     decoration: const InputDecoration(
                       labelText: 'Username',
                       hintText: 'Enter your username',
+                      hintStyle: TextStyle(fontFamily: 'Montserrat'),
+                      labelStyle: TextStyle(fontFamily: 'Montserrat'),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(12.0)),
                       ),
@@ -84,6 +83,8 @@ class _LoginPageState extends State<LoginPage> {
                     decoration: const InputDecoration(
                       labelText: 'Password',
                       hintText: 'Enter your password',
+                      hintStyle: TextStyle(fontFamily: 'Montserrat'),
+                      labelStyle: TextStyle(fontFamily: 'Montserrat'),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(12.0)),
                       ),
@@ -151,7 +152,10 @@ class _LoginPageState extends State<LoginPage> {
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
                     ),
-                    child: const Text('Login'),
+                    child: const Text(
+                      'Login',
+                      style: TextStyle(fontFamily: 'Montserrat'),
+                    ),
                   ),
                   const SizedBox(height: 36.0),
                   GestureDetector(
@@ -165,9 +169,9 @@ class _LoginPageState extends State<LoginPage> {
                     child: Text(
                       'Don\'t have an account? Register',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 16.0,
-                      ),
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 14.0,
+                          fontFamily: 'Montserrat'),
                     ),
                   ),
                 ],

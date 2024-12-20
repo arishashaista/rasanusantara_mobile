@@ -35,6 +35,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   ];
 
   final List<String> _sortOptions = [
+    "Filter",
     "Harga Tertinggi",
     "Harga Terendah",
     "Rating Tertinggi",
@@ -42,7 +43,7 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
   ];
 
   String _selectedCategory = "Semua Kategori";
-  String _selectedSortOption = "Rating Tertinggi";
+  String _selectedSortOption = "Filter";
 
   Future<void> fetchRestaurants(CookieRequest request) async {
     try {
@@ -157,6 +158,11 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                     onChanged: (value) => _applyFilters(),
                     decoration: const InputDecoration(
                       hintText: 'Ingin makan apa hari ini?',
+                      hintStyle: TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'Montserrat',
+                        color: Colors.grey,
+                      ),
                       border: InputBorder.none,
                       prefixIcon: Icon(Icons.search, color: Colors.orange),
                       contentPadding:
@@ -168,44 +174,83 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
                     children: [
-                      Expanded(
-                        child: DropdownButton<String>(
-                          value: _selectedCategory,
-                          items: _categories.map((category) {
-                            return DropdownMenuItem(
-                              value: category,
-                              child: Text(category),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            if (value != null) {
-                              setState(() {
-                                _selectedCategory = value;
-                                _applyFilters();
-                              });
-                            }
-                          },
-                        ),
+                      Flexible(
+                        child: DropdownButtonFormField<String>(
+                            value: _selectedCategory,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                              filled: true,
+                              fillColor: Colors.orange,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            dropdownColor: Colors.orange[100],
+                            items: _categories.map((category) {
+                              return DropdownMenuItem(
+                                value: category,
+                                child: Text(
+                                  category,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontFamily: 'Montserrat',
+                                  ),
+                                  overflow: TextOverflow
+                                      .ellipsis, // Menyediakan overflow teks
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() {
+                                  _selectedCategory = value;
+                                  _applyFilters();
+                                });
+                              }
+                            },
+                            menuMaxHeight: 200),
                       ),
                       const SizedBox(width: 8),
-                      Expanded(
-                        child: DropdownButton<String>(
-                          value: _selectedSortOption,
-                          items: _sortOptions.map((option) {
-                            return DropdownMenuItem(
-                              value: option,
-                              child: Text(option),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            if (value != null) {
-                              setState(() {
-                                _selectedSortOption = value;
-                                _applyFilters();
-                              });
-                            }
-                          },
-                        ),
+                      Flexible(
+                        child: DropdownButtonFormField<String>(
+                            value: _selectedSortOption,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                              filled: true,
+                              fillColor: Colors.orange,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            dropdownColor: Colors.orange.shade100,
+                            items: _sortOptions.map((option) {
+                              return DropdownMenuItem(
+                                value: option,
+                                child: Text(
+                                  option,
+                                  style: const TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      color: Colors.white,
+                                      fontSize: 12),
+                                  overflow: TextOverflow
+                                      .ellipsis, // Menyediakan overflow teks
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() {
+                                  _selectedSortOption = value;
+                                  _applyFilters();
+                                });
+                              }
+                            },
+                            menuMaxHeight: 200),
                       ),
                     ],
                   ),

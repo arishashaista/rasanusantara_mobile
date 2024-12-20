@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:rasanusantara_mobile/Katalog/screens/restaurant_list_page.dart';
 import 'dart:convert';
 import 'package:rasanusantara_mobile/card.dart';
+import 'package:rasanusantara_mobile/navbar.dart';
 import 'package:rasanusantara_mobile/restaurant.dart';
 import 'package:rasanusantara_mobile/Katalog/screens/restaurant_detail_page.dart';
 
@@ -67,48 +69,51 @@ class _MenuPageState extends State<MenuPage> {
       ..sort((a, b) => b.rating.compareTo(a.rating));
 
     return Scaffold(
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Bagian Background
-                  Container(
-                    height: 250,
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage('lib/assets/Homepage.png'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        top: MediaQuery.of(context).padding.top + 16,
-                        left: 16,
-                        right: 16,
-                      ),
-                      child: _buildSearchBar(),
+      body: Stack(
+        children: [
+          // Background and main content
+          SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Background image
+                Container(
+                  height: 250,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('lib/assets/Homepage.png'),
+                      fit: BoxFit.cover,
                     ),
                   ),
-
-                  // Bagian Hasil Pencarian
-                  if (_searchResults.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: _buildSearchResults(),
-                    ),
-
-                  // Restoran Populer
-                  _buildSectionHeader('Restoran Populer'),
-                  _buildRestaurantList(topRatedRestaurants.take(8).toList()),
-
-                  // Restoran Gudeg
-                  _buildSectionHeader('Restoran Gudeg'),
-                  _buildRestaurantList(gudegRestaurants.take(8).toList()),
-                ],
-              ),
+                ),
+                // Spacing for search bar and results
+                SizedBox(height: 10),
+                // Content below search bar
+                _buildSectionHeader('Restoran Populer'),
+                _buildRestaurantList(topRatedRestaurants.take(8).toList()),
+                _buildSectionHeader('Restoran Gudeg'),
+                _buildRestaurantList(gudegRestaurants.take(8).toList()),
+              ],
             ),
+          ),
+
+          // Search bar and results overlay
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 15,
+            left: 14,
+            right: 14,
+            child: Column(
+              children: [
+                // Search bar
+                _buildSearchBar(),
+                const SizedBox(height: 10),
+                // Search results
+                if (_searchResults.isNotEmpty) _buildSearchResultsOverlay(),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -169,7 +174,14 @@ class _MenuPageState extends State<MenuPage> {
             ),
           ),
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const Navbar(selectedIndex: 1),
+                ),
+              );
+            },
             style: TextButton.styleFrom(
               backgroundColor: Colors.orange,
               foregroundColor: Colors.white,
@@ -212,18 +224,84 @@ class _MenuPageState extends State<MenuPage> {
     );
   }
 
-  Widget _buildSearchResults() {
+  // Widget _buildSearchResults() {
+  //   return Container(
+  //     padding: const EdgeInsets.all(8),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(12),
+  //       boxShadow: const [
+  //         BoxShadow(
+  //           color: Colors.black12,
+  //           blurRadius: 5,
+  //           offset: Offset(0, 3),
+  //         ),
+  //       ],
+  //     ),
+  //     child: ListView.builder(
+  //       shrinkWrap: true,
+  //       physics: const NeverScrollableScrollPhysics(),
+  //       itemCount: _searchResults.length,
+  //       itemBuilder: (context, index) {
+  //         final restaurant = _searchResults[index];
+  //         return ListTile(
+  //           leading: ClipRRect(
+  //             borderRadius: BorderRadius.circular(8),
+  //             child: Image.network(
+  //               restaurant.image,
+  //               width: 50,
+  //               height: 50,
+  //               fit: BoxFit.cover,
+  //             ),
+  //           ),
+  //           title: Text(
+  //             restaurant.name,
+  //             style: const TextStyle(
+  //               fontWeight: FontWeight.bold,
+  //               fontSize: 14,
+  //               fontFamily: 'Montserrat',
+  //             ),
+  //             maxLines: 1,
+  //             overflow: TextOverflow.ellipsis,
+  //           ),
+  //           subtitle: Text(
+  //             restaurant.location,
+  //             style: const TextStyle(
+  //               fontSize: 12,
+  //               color: Colors.grey,
+  //               fontFamily: 'Montserrat',
+  //             ),
+  //             maxLines: 1,
+  //             overflow: TextOverflow.ellipsis,
+  //           ),
+  //           onTap: () {
+  //             Navigator.push(
+  //               context,
+  //               MaterialPageRoute(
+  //                 builder: (context) => RestaurantDetailPage(
+  //                   restaurant: restaurant,
+  //                 ),
+  //               ),
+  //             );
+  //           },
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
+
+  Widget _buildSearchResultsOverlay() {
     return Container(
       padding: const EdgeInsets.all(8),
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(top: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [
           BoxShadow(
-            color: Colors.black12,
+            color: Colors.black26,
             blurRadius: 5,
-            offset: Offset(0, 3),
+            offset: Offset(0, 2),
           ),
         ],
       ),

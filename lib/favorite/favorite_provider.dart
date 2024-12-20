@@ -12,15 +12,19 @@ class FavoriteProvider extends ChangeNotifier {
 
   Future<void> initializeFavorites(CookieRequest request) async {
     try {
-      final response =
-          await request.get('http://127.0.0.1:8000/favorite/json/');
-      if (response != null) {
-        _favoriteIds.clear();
-        for (var fav in response) {
-          _favoriteIds.add(fav['id'].toString());
+      if (request.loggedIn) {
+        final response =
+            await request.get('http://127.0.0.1:8000/favorite/json/');
+        if (response != null) {
+          _favoriteIds.clear();
+          for (var fav in response) {
+            _favoriteIds.add(fav['id'].toString());
+          }
+          _isInitialized = true;
+          notifyListeners(); // Beri tahu listener bahwa data telah diperbarui
         }
-        _isInitialized = true;
-        notifyListeners(); // Beri tahu semua listener bahwa data telah diperbarui
+      } else {
+        resetFavorites(); // Jika tidak login, reset data favorit
       }
     } catch (e) {
       debugPrint('Error initializing favorites: $e');
@@ -55,6 +59,12 @@ class FavoriteProvider extends ChangeNotifier {
         _showErrorDialog(context, 'Failed to connect to the server: $e');
       }
     }
+  }
+
+  void resetFavorites() {
+    _favoriteIds.clear();
+    _isInitialized = false;
+    notifyListeners(); // Beri tahu listener bahwa data telah dihapus
   }
 
   void _showLoginAlert(BuildContext context) {

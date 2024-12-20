@@ -4,47 +4,64 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:rasanusantara_mobile/home.dart';
 import 'package:rasanusantara_mobile/favorite/profileandfavorite.dart';
 import 'package:rasanusantara_mobile/authentication/screens/login.dart';
-import 'package:rasanusantara_mobile/Katalog/screens/restaurant_list_page.dart'; // Import halaman Menu
+import 'package:rasanusantara_mobile/Katalog/screens/restaurant_list_page.dart';
 
 class Navbar extends StatefulWidget {
-  const Navbar({super.key});
+  final int selectedIndex;
+
+  const Navbar({Key? key, this.selectedIndex = 0}) : super(key: key);
 
   @override
   State<Navbar> createState() => _NavbarState();
 }
 
 class _NavbarState extends State<Navbar> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.selectedIndex;
+  }
+
+  void navigateToPage(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  Widget _getPage(int index) {
+    final request = context.watch<CookieRequest>();
+    switch (index) {
+      case 0:
+        return const MenuPage(); // Home Page
+      case 1:
+        return const RestaurantListPage(); // Menu Page
+      case 2:
+        return Container(); // Placeholder Kalender
+      case 3:
+        return request.loggedIn
+            ? const ProfileFavorite()
+            : const LoginPage(); // Profile
+      default:
+        return const MenuPage(); // Default Page
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final request = context.watch<CookieRequest>();
-
-    final List<Widget> pages = [
-      const MenuPage(), // Home Page
-      const RestaurantListPage(), // Menu Page
-      Container(), // Placeholder untuk Kalender
-      request.loggedIn ? const ProfileFavorite() : const LoginPage(), // Profile
-    ];
-
-    void _onItemTapped(int index) {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
-
     return Scaffold(
-      body: pages[_selectedIndex],
+      body: _getPage(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        onTap: navigateToPage,
         selectedItemColor: Colors.orange,
         unselectedItemColor: Colors.white,
-        backgroundColor: Colors.brown[900], // Warna background navbar coklat
-        type: BottomNavigationBarType.fixed, // Hindari efek shifting
-        showSelectedLabels: false, // Hilangkan label saat item dipilih
-        showUnselectedLabels: false, // Hilangkan label saat item tidak dipilih
-        iconSize: 30, // Ukuran ikon diperbesar, sesuaikan dengan kebutuhan
+        backgroundColor: Colors.brown[900],
+        type: BottomNavigationBarType.fixed,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        iconSize: 30,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_rounded),

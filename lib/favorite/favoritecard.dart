@@ -93,7 +93,6 @@ class _FavoriteProductCardState extends State<FavoriteProductCard> {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        const SizedBox(height: 4),
                         Text(
                           widget.restaurant.location,
                           style: const TextStyle(
@@ -103,16 +102,50 @@ class _FavoriteProductCardState extends State<FavoriteProductCard> {
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
+                        if (widget.restaurant.menuItems.isNotEmpty &&
+                            widget.restaurant.menuItems.first.categories
+                                .isNotEmpty)
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 4,
+                            children: widget
+                                .restaurant.menuItems.first.categories
+                                .map((category) {
+                              return Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.orange.shade200,
+                                      Colors.orange,
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  category,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontFamily: 'Montserrat',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
                         Row(
                           children: [
                             const Icon(Icons.star,
-                                color: Colors.orange, size: 16),
+                                color: Colors.orange, size: 18),
                             const SizedBox(width: 4),
                             Text(
                               '${widget.restaurant.rating}/5',
                               style: const TextStyle(
                                 fontFamily: 'Montserrat',
                                 fontSize: 12,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:rasanusantara_mobile/favorite/favorite_provider.dart';
 import 'package:rasanusantara_mobile/restaurant.dart';
 import 'package:rasanusantara_mobile/favorite/favoritecard.dart';
 
@@ -66,6 +67,44 @@ class _ProfileFavoriteState extends State<ProfileFavorite> {
     }
   }
 
+  Future<void> fetchRestaurants(CookieRequest request) async {
+    try {
+      final response = await request.get('http://127.0.0.1:8000/json/');
+      List<Restaurant> listRestaurant = [];
+      for (var d in response) {
+        if (d != null) {
+          listRestaurant.add(Restaurant.fromJson(d));
+        }
+      }
+      setState(() {
+        favoriteRestaurants = listRestaurant;
+        filteredRestaurants = listRestaurant; // Awalnya semua data tampil
+        isLoading = false;
+      });
+    } catch (error) {
+      setState(() {
+        isLoading = false;
+      });
+      _showErrorDialog('Gagal memuat restoran. Periksa koneksi Anda.');
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Kesalahan'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void searchFavorites(String query) {
     setState(() {
       searchQuery = query;
@@ -78,6 +117,8 @@ class _ProfileFavoriteState extends State<ProfileFavorite> {
 
   void logout() async {
     final request = Provider.of<CookieRequest>(context, listen: false);
+    final favoriteProvider =
+        Provider.of<FavoriteProvider>(context, listen: false);
     const url = 'http://127.0.0.1:8000/auth/logout/';
 
     try {
@@ -85,6 +126,9 @@ class _ProfileFavoriteState extends State<ProfileFavorite> {
 
       if (response['status'] == true) {
         request.loggedIn = false;
+
+        // Reset favorites saat logout
+        favoriteProvider.resetFavorites();
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -152,7 +196,7 @@ class _ProfileFavoriteState extends State<ProfileFavorite> {
                     ),
                   ),
                   Text(
-                    'Makanan favoritmu ada ${filteredRestaurants.length}',
+                    'Restoran favoritmu ada ${favoriteRestaurants.length}',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -182,12 +226,15 @@ class _ProfileFavoriteState extends State<ProfileFavorite> {
                 Expanded(
                   child: TextField(
                     decoration: InputDecoration(
-                      hintText: 'Cari makanan favoritmu',
+                      hintText: 'Cari restoran favoritmu',
                       hintStyle: const TextStyle(
                         color: Colors.grey,
                         fontFamily: 'Montserrat',
                       ),
-                      prefixIcon: const Icon(Icons.search),
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: Colors.orange,
+                      ),
                       filled: true,
                       fillColor: Colors.grey[200],
                       border: OutlineInputBorder(
@@ -199,20 +246,6 @@ class _ProfileFavoriteState extends State<ProfileFavorite> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    // Placeholder implementasi filter
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  icon: const Icon(Icons.filter_list),
-                  label: const Text('Filter'),
-                ),
               ],
             ),
           ),
