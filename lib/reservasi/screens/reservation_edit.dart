@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:rasanusantara_mobile/navbar.dart';
 import 'package:rasanusantara_mobile/reservasi/screens/reservation_user.dart';
 import 'dart:convert';
 
@@ -51,7 +52,8 @@ class _ReservationEditPageState extends State<ReservationEditPage> {
 
   Future<void> updateReservation() async {
     final request = context.read<CookieRequest>();
-    final String url = 'http://127.0.0.1:8000/reservasi/edit_flutter/${widget.reservationId}/';
+    final String url =
+        'http://127.0.0.1:8000/reservasi/edit_flutter/${widget.reservationId}/';
 
     try {
       final response = await request.postJson(
@@ -68,11 +70,13 @@ class _ReservationEditPageState extends State<ReservationEditPage> {
         if (!context.mounted) return;
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
-          ..showSnackBar(SnackBar(content: Text('Reservasi berhasil diperbarui!')));
+          ..showSnackBar(
+              SnackBar(content: Text('Reservasi berhasil diperbarui!')));
 
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const ReservationUserPage()),
+          MaterialPageRoute(
+              builder: (context) => const Navbar(selectedIndex: 2)),
           (Route<dynamic> route) => false,
         );
       } else {
@@ -80,7 +84,8 @@ class _ReservationEditPageState extends State<ReservationEditPage> {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(SnackBar(
-            content: Text('Gagal memperbarui reservasi: ${response['message']}'),
+            content:
+                Text('Gagal memperbarui reservasi: ${response['message']}'),
             backgroundColor: Colors.red,
           ));
       }
@@ -227,12 +232,15 @@ class _ReservationEditPageState extends State<ReservationEditPage> {
                         onPressed: updateReservation,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange,
-                          padding: EdgeInsets.symmetric(horizontal: 50, vertical: 16),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 50, vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        child: Text('Reservasi', style: TextStyle(color: Colors.white, fontSize: 18)),
+                        child: Text('Reservasi',
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 18)),
                       ),
                     ),
                   ],

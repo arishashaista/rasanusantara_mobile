@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:rasanusantara_mobile/navbar.dart';
 import 'package:rasanusantara_mobile/reservasi/screens/reservation_user.dart';
-
 
 class ReservationDeletePage extends StatelessWidget {
   final int reservationId;
@@ -34,21 +34,15 @@ class ReservationDeletePage extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Reservasi berhasil dibatalkan!')),
         );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal membatalkan reservasi: ${response['message']}')),
-        );
       }
-    } catch (e) {
-      Navigator.pop(context); // Close the loading dialog
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
     } finally {
       // Ensure redirection happens regardless of success or error
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const ReservationUserPage()),
+        MaterialPageRoute(
+            builder: (context) => const Navbar(
+                  selectedIndex: 2,
+                )),
         (Route<dynamic> route) => false,
       );
     }
@@ -80,7 +74,8 @@ class ReservationDeletePage extends StatelessWidget {
                 backgroundColor: Colors.red,
                 padding: EdgeInsets.symmetric(vertical: 16),
               ),
-              child: Text('Batalkan Reservasi', style: TextStyle(color: Colors.white)),
+              child: Text('Batalkan Reservasi',
+                  style: TextStyle(color: Colors.white)),
             ),
             SizedBox(height: 12),
             TextButton(

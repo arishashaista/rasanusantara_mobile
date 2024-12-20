@@ -8,6 +8,7 @@ import 'package:rasanusantara_mobile/home.dart';
 import 'package:rasanusantara_mobile/favorite/profileandfavorite.dart';
 import 'package:rasanusantara_mobile/authentication/screens/login.dart';
 import 'package:rasanusantara_mobile/Katalog/screens/restaurant_list_page.dart';
+import 'package:rasanusantara_mobile/reservasi/screens/reservation_user.dart';
 
 class Navbar extends StatefulWidget {
   final int selectedIndex;
@@ -61,7 +62,9 @@ class _NavbarState extends State<Navbar> {
         case 1:
           return const RestaurantListPage(); // Menu Page
         case 2:
-          return Container(); // Placeholder Kalender
+          return request.loggedIn
+              ? const ReservationUserPage()
+              : const LoginPage(); //// Placeholder Kalender
         case 3:
           return request.loggedIn
               ? const ProfileFavorite()

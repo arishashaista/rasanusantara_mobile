@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:rasanusantara_mobile/favorite/favorite_provider.dart';
+import 'package:rasanusantara_mobile/reservasi/screens/reservation_form.dart';
 import 'package:rasanusantara_mobile/restaurant.dart';
 import 'package:rasanusantara_mobile/review/screens/review_page.dart';
 
@@ -200,7 +201,18 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                         children: [
                           Expanded(
                             child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ReservationForm(
+                                      restaurantName: widget.restaurant.name,
+                                      restaurantImage: widget.restaurant.image,
+                                      restaurantid: widget.restaurant.id,
+                                    ),
+                                  ),
+                                );
+                              },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.orange,
                                 foregroundColor: Colors.white,
