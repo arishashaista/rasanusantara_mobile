@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:rasanusantara_mobile/admin/admin_detail.dart';
 import 'package:rasanusantara_mobile/restaurant.dart';
-import '../screens/restaurant_card.dart';
-import '../screens/restaurant_detail_page.dart';
-import '/favorite/favorite_provider.dart';
+import 'package:rasanusantara_mobile/admin/admin_card.dart';
 
-class RestaurantListPage extends StatefulWidget {
-  const RestaurantListPage({super.key});
+class AdminListPage extends StatefulWidget {
+  const AdminListPage({super.key});
 
   @override
-  State<RestaurantListPage> createState() => _RestaurantListPageState();
+  State<AdminListPage> createState() => _AdminListPageState();
 }
 
-class _RestaurantListPageState extends State<RestaurantListPage> {
+class _AdminListPageState extends State<AdminListPage> {
   final TextEditingController _searchController = TextEditingController();
   List<Restaurant> _allRestaurants = [];
   List<Restaurant> _filteredRestaurants = [];
@@ -115,11 +114,6 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final request = Provider.of<CookieRequest>(context, listen: false);
-      final favoriteProvider =
-          Provider.of<FavoriteProvider>(context, listen: false);
-
-      // Inisialisasi data favorit dan restoran
-      await favoriteProvider.initializeFavorites(request);
       await fetchRestaurants(request);
     });
   }
@@ -270,13 +264,13 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                         )
                       : ListView.builder(
                           itemCount: _filteredRestaurants.length,
-                          itemBuilder: (_, index) => RestaurantCard(
+                          itemBuilder: (_, index) => AdminCard(
                             restaurant: _filteredRestaurants[index],
                             onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => RestaurantDetailPage(
+                                  builder: (context) => AdminDetail(
                                     restaurant: _filteredRestaurants[index],
                                   ),
                                 ),
