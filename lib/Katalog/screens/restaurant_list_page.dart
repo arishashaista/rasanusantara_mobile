@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import '../models/restaurant.dart';
+import 'package:rasanusantara_mobile/restaurant.dart';
 import '../screens/restaurant_card.dart';
 import '../screens/restaurant_detail_page.dart';
-import '../../authentication/screens/login.dart';
+import '/favorite/favorite_provider.dart';
 
 class RestaurantListPage extends StatefulWidget {
   const RestaurantListPage({super.key});
@@ -15,103 +15,231 @@ class RestaurantListPage extends StatefulWidget {
 
 class _RestaurantListPageState extends State<RestaurantListPage> {
   final TextEditingController _searchController = TextEditingController();
+  List<Restaurant> _allRestaurants = [];
+  List<Restaurant> _filteredRestaurants = [];
+  bool _isLoading = true;
 
-  Future<List<Restaurant>> fetchRestaurants(CookieRequest request) async {
-    final response = await request.get('http://127.0.0.1:8000/json/'); //nanti sesuain urlnya
-    List<Restaurant> listRestaurant = [];
-    for (var d in response) {
-      if (d != null) {
-        listRestaurant.add(Restaurant.fromJson(d));
+  final List<String> _categories = [
+    "Semua Kategori",
+    "Gudeg",
+    "Oseng",
+    "Bakpia",
+    "Sate",
+    "Sego Gurih",
+    "Wedang",
+    "Lontong",
+    "Rujak Cingur",
+    "Mangut Lele",
+    "Ayam",
+    "Lainnya"
+  ];
+
+  final List<String> _sortOptions = [
+    "Harga Tertinggi",
+    "Harga Terendah",
+    "Rating Tertinggi",
+    "Rating Terendah",
+  ];
+
+  String _selectedCategory = "Semua Kategori";
+  String _selectedSortOption = "Rating Tertinggi";
+
+  Future<void> fetchRestaurants(CookieRequest request) async {
+    try {
+      final response = await request.get('http://127.0.0.1:8000/json/');
+      List<Restaurant> listRestaurant = [];
+      for (var d in response) {
+        if (d != null) {
+          listRestaurant.add(Restaurant.fromJson(d));
+        }
       }
+      setState(() {
+        _allRestaurants = listRestaurant;
+        _filteredRestaurants = listRestaurant;
+        _isLoading = false;
+      });
+    } catch (error) {
+      setState(() {
+        _isLoading = false;
+      });
+      _showErrorDialog('Gagal memuat restoran. Periksa koneksi Anda.');
     }
-    return listRestaurant;
+  }
+
+  void _applyFilters() {
+    setState(() {
+      final query = _searchController.text.toLowerCase();
+
+      _filteredRestaurants = _allRestaurants.where((restaurant) {
+        final matchesSearch = restaurant.name.toLowerCase().contains(query);
+        final matchesCategory = _selectedCategory == "Semua Kategori" ||
+            restaurant.menuItems.any(
+                (menuItem) => menuItem.categories.contains(_selectedCategory));
+
+        return matchesSearch && matchesCategory;
+      }).toList();
+
+      if (_selectedSortOption == "Harga Tertinggi") {
+        _filteredRestaurants
+            .sort((a, b) => b.averagePrice.compareTo(a.averagePrice));
+      } else if (_selectedSortOption == "Harga Terendah") {
+        _filteredRestaurants
+            .sort((a, b) => a.averagePrice.compareTo(b.averagePrice));
+      } else if (_selectedSortOption == "Rating Tertinggi") {
+        _filteredRestaurants.sort((a, b) => b.rating.compareTo(a.rating));
+      } else if (_selectedSortOption == "Rating Terendah") {
+        _filteredRestaurants.sort((a, b) => a.rating.compareTo(b.rating));
+      }
+    });
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final request = Provider.of<CookieRequest>(context, listen: false);
+      final favoriteProvider =
+          Provider.of<FavoriteProvider>(context, listen: false);
+
+      // Inisialisasi data favorit dan restoran
+      await favoriteProvider.initializeFavorites(request);
+      await fetchRestaurants(request);
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+
     return Scaffold(
-      appBar: AppBar(
-        title: TextField(
-          controller: _searchController,
-          decoration: InputDecoration(
-            hintText: 'Ingin makan apa hari ini?',
-            border: InputBorder.none,
-            suffixIcon: Icon(Icons.search),
-          ),
-        ),
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Row(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
               children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {},
-                    icon: Icon(Icons.filter_list),
-                    label: Text('Filter'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
+                Container(
+                  margin: const EdgeInsets.only(
+                      top: 20, left: 16, right: 16, bottom: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 5,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (value) => _applyFilters(),
+                    decoration: const InputDecoration(
+                      hintText: 'Ingin makan apa hari ini?',
+                      border: InputBorder.none,
+                      prefixIcon: Icon(Icons.search, color: Colors.orange),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     ),
                   ),
                 ),
-                SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {},
-                    icon: Icon(Icons.restaurant),
-                    label: Text('Semua Restoran'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
-                    ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButton<String>(
+                          value: _selectedCategory,
+                          items: _categories.map((category) {
+                            return DropdownMenuItem(
+                              value: category,
+                              child: Text(category),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                _selectedCategory = value;
+                                _applyFilters();
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: DropdownButton<String>(
+                          value: _selectedSortOption,
+                          items: _sortOptions.map((option) {
+                            return DropdownMenuItem(
+                              value: option,
+                              child: Text(option),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                _selectedSortOption = value;
+                                _applyFilters();
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
+                ),
+                Expanded(
+                  child: _filteredRestaurants.isEmpty
+                      ? const Center(
+                          child: Text(
+                            "Tidak ada restoran yang dicari.",
+                            style: TextStyle(
+                              color: Color(0xff59A5D8),
+                              fontSize: 20,
+                            ),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: _filteredRestaurants.length,
+                          itemBuilder: (_, index) => RestaurantCard(
+                            restaurant: _filteredRestaurants[index],
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => RestaurantDetailPage(
+                                    restaurant: _filteredRestaurants[index],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
                 ),
               ],
             ),
-          ),
-          Expanded(
-            child: FutureBuilder(
-              future: fetchRestaurants(request),
-              builder: (context, AsyncSnapshot snapshot) {
-                if (snapshot.data == null) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (!snapshot.hasData) {
-                  return const Center(
-                    child: Text(
-                      "Belum ada restoran yang tersedia.",
-                      style: TextStyle(
-                        color: Color(0xff59A5D8),
-                        fontSize: 20,
-                      ),
-                    ),
-                  );
-                } else {
-                  return ListView.builder(
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (_, index) => RestaurantCard(
-                      restaurant: snapshot.data![index],
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => RestaurantDetailPage(
-                              restaurant: snapshot.data![index],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                }
-              },
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
