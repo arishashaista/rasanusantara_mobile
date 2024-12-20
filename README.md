@@ -84,3 +84,5 @@ daftar produk, atau detail produk.
 ditampilkan dalam interface user menggunakan widget seperti ListView, GridView, atau lainnya.
 8. Mengintegrasikan Flutter dengan server Django menggunakan konsep asynchronous HTTP melalui Future dan async/await dan 
 melakukan testing untuk memastikan data yang dikirimkan dan diterima sesuai dengan spesifikasi API.
+
+-
