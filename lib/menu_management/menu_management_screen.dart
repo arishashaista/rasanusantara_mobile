@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rasanusantara_mobile/menu_management/menu_item_model.dart';
 import 'package:rasanusantara_mobile/menu_management/menu_service.dart';
-import 'menu_item_form.dart';
+import 'add_menu.dart';
 
 class MenuManagementScreen extends StatefulWidget {
   final String restaurantId;
@@ -60,6 +60,21 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
         ],
       ),
     );
+  }
+
+  void _navigateToAddMenu() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddMenuPage(
+          restaurantId: widget.restaurantId,
+        ),
+      ),
+    ).then((value) {
+      if (value == true) {
+        _fetchMenuItems(); // Refresh daftar menu setelah berhasil menambah
+      }
+    });
   }
 
   @override
@@ -146,28 +161,19 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     );
   }
 
-  void _navigateToAddMenu() {
+  void _navigateToEditMenu(MenuItem menuItem) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => MenuItemForm(
+        builder: (context) => AddMenuPage(
           restaurantId: widget.restaurantId,
-          onMenuUpdated: _fetchMenuItems,
+          menuItemId: menuItem.id, // Tambahkan menuItemId untuk pengeditan
         ),
       ),
-    );
+    ).then((value) {
+      if (value == true) {
+        _fetchMenuItems(); // Refresh daftar menu setelah berhasil diperbarui
+      }
+    });
   }
-
- void _navigateToEditMenu(MenuItem menuItem) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => MenuItemForm(
-        restaurantId: widget.restaurantId,
-        menuItemId: menuItem.id, // Ganti menuItem ke menuItemId
-        onMenuUpdated: _fetchMenuItems,
-      ),
-    ),
-  );
-}
 }
