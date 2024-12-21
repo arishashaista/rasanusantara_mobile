@@ -3,7 +3,6 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:rasanusantara_mobile/authentication/screens/register.dart';
 import 'package:rasanusantara_mobile/navbar.dart';
-import 'package:rasanusantara_mobile/restaurant_admin.dart';
 
 void main() {
   runApp(const LoginApp());
@@ -114,14 +113,16 @@ class _LoginPageState extends State<LoginPage> {
                       if (request.loggedIn) {
                         String message = response['message'];
                         String uname = response['username'];
-                        
-                        final superuserResponse = await request.get('http://127.0.0.1:8000/auth/is-superuser/');
-                        
+
+                        final superuserResponse = await request
+                            .get('http://127.0.0.1:8000/auth/is-superuser/');
+
                         if (context.mounted) {
                           if (superuserResponse['is_superuser'] == true) {
                             Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(builder: (context) => const AdminRestaurantScreen()),
+                              MaterialPageRoute(
+                                  builder: (context) => const Navbar()),
                             );
                           } else {
                             Navigator.pushReplacement(
@@ -129,11 +130,13 @@ class _LoginPageState extends State<LoginPage> {
                               MaterialPageRoute(builder: (context) => Navbar()),
                             );
                           }
-                          
+
                           ScaffoldMessenger.of(context)
                             ..hideCurrentSnackBar()
                             ..showSnackBar(
-                              SnackBar(content: Text("$message Selamat datang, $uname.")),
+                              SnackBar(
+                                  content:
+                                      Text("$message Selamat datang, $uname.")),
                             );
                         }
                       } else {
