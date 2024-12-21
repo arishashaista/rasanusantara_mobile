@@ -22,8 +22,17 @@ class _MenuItemFormState extends State<MenuItemForm> {
   final _nameController = TextEditingController();
   List<String> _selectedCategories = [];
   final List<String> _allowedCategories = [
-    "gudeg", "oseng", "bakpia", "sate", "sego gurih",
-    "wedang", "lontong", "rujak cingur", "mangut lele", "ayam", "lainnya"
+    "gudeg",
+    "oseng",
+    "bakpia",
+    "sate",
+    "sego gurih",
+    "wedang",
+    "lontong",
+    "rujak cingur",
+    "mangut lele",
+    "ayam",
+    "lainnya"
   ];
 
   bool _isLoading = false;
@@ -155,8 +164,8 @@ class _MenuItemFormState extends State<MenuItemForm> {
                     ),
                     const SizedBox(height: 12),
                     const Text('Pilih Kategori',
-                        style:
-                            TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
                     Wrap(
                       spacing: 8,
                       children: _allowedCategories.map((category) {

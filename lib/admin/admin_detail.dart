@@ -5,8 +5,6 @@ import 'package:rasanusantara_mobile/restaurant.dart';
 import 'package:rasanusantara_mobile/review/screens/review_page.dart';
 import 'package:rasanusantara_mobile/menu_management/menu_management_screen.dart';
 
-
-
 class AdminDetail extends StatefulWidget {
   final Restaurant restaurant;
 
@@ -186,45 +184,25 @@ class _AdminDetailState extends State<AdminDetail> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => ReviewPage(
-                                  restaurantName: widget.restaurant.name,
-                                  restaurantImage: widget.restaurant.image,
+                                builder: (context) => MenuManagementScreen(
+                                  restaurantId: widget.restaurant.id,
                                 ),
                               ),
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange,
+                            backgroundColor: Colors.orange.shade900,
                             foregroundColor: Colors.white,
                           ),
                           child: const Text(
-                            'Review',
-                            style: TextStyle(fontFamily: 'Montserrat'),
+                            'Edit Menu',
+                            style: TextStyle(
+                              fontFamily: 'Montserrat',
+                            ),
                           ),
                         ),
                       ),
                     ],
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MenuManagementScreen(
-                            restaurantId: widget.restaurant.id, // Kirimkan restaurantId
-                          ),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text(
-                      'Add Menu',
-                      style: TextStyle(fontFamily: 'Montserrat'),
-                    ),
                   ),
                 ],
               ),
