@@ -226,7 +226,36 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: ElevatedButton(
-                              onPressed: () {
+                              onPressed: () async {
+                                final request = Provider.of<CookieRequest>(context, listen: false);
+                                
+                                // Cek status login
+                                if (!request.loggedIn) {
+                                  // Jika belum login, tampilkan dialog dan redirect ke login page
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Login Required'),
+                                      content: const Text('Login untuk menambahkan review'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            Navigator.pushNamed(context, '/login');
+                                          },
+                                          child: const Text('Login'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context),
+                                          child: const Text('Cancel'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                // Jika sudah login, lanjutkan ke halaman review
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
