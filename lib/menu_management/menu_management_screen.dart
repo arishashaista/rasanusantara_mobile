@@ -158,16 +158,16 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     );
   }
 
-  void _navigateToEditMenu(MenuItem menuItem) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MenuItemForm(
-          restaurantId: widget.restaurantId,
-          menuItem: menuItem,
-          onMenuUpdated: _fetchMenuItems,
-        ),
+ void _navigateToEditMenu(MenuItem menuItem) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => MenuItemForm(
+        restaurantId: widget.restaurantId,
+        menuItemId: menuItem.id, // Ganti menuItem ke menuItemId
+        onMenuUpdated: _fetchMenuItems,
       ),
-    );
-  }
+    ),
+  );
+}
 }

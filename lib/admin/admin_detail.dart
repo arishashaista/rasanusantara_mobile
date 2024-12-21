@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:rasanusantara_mobile/restaurant.dart';
 import 'package:rasanusantara_mobile/review/screens/review_page.dart';
+import 'package:rasanusantara_mobile/menu_management/menu_management_screen.dart';
+
+
 
 class AdminDetail extends StatefulWidget {
   final Restaurant restaurant;
@@ -69,16 +72,6 @@ class _AdminDetailState extends State<AdminDetail> {
                       icon: const Icon(Icons.arrow_back),
                       color: Colors.orange,
                       onPressed: () => Navigator.pop(context),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 40,
-                  right: 10,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
                     ),
                   ),
                 ),
@@ -211,6 +204,27 @@ class _AdminDetailState extends State<AdminDetail> {
                         ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MenuManagementScreen(
+                            restaurantId: widget.restaurant.id, // Kirimkan restaurantId
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.white,
+                    ),
+                    child: const Text(
+                      'Add Menu',
+                      style: TextStyle(fontFamily: 'Montserrat'),
+                    ),
                   ),
                 ],
               ),
