@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:rasanusantara_mobile/menu_management/menu_item_model.dart';
-import 'package:rasanusantara_mobile/menu_management/menu_service.dart';
-import 'add_menu.dart';
+import 'menu_item_model.dart';
+import 'menu_service.dart';
+import 'menu_item_form.dart';
 
 class MenuManagementScreen extends StatefulWidget {
   final String restaurantId;
 
-  const MenuManagementScreen({super.key, required this.restaurantId});
+  const MenuManagementScreen({Key? key, required this.restaurantId})
+      : super(key: key);
 
   @override
   _MenuManagementScreenState createState() => _MenuManagementScreenState();
@@ -23,16 +24,15 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
   }
 
   Future<void> _fetchMenuItems() async {
+    setState(() => isLoading = true);
     try {
-      List<MenuItem> items = await MenuService.fetchMenuItems(widget.restaurantId);
+      final items = await MenuService.fetchMenuItems(widget.restaurantId);
       setState(() {
         menuItems = items;
         isLoading = false;
       });
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      setState(() => isLoading = false);
       _showErrorDialog('Failed to load menu items: $e');
     }
   }
@@ -40,7 +40,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
   void _deleteMenuItem(String menuItemId) async {
     try {
       await MenuService.deleteMenuItem(widget.restaurantId, menuItemId);
-      _fetchMenuItems(); // Refresh the list after deletion
+      _fetchMenuItems(); // Refresh
     } catch (e) {
       _showErrorDialog('Failed to delete menu item: $e');
     }
@@ -49,13 +49,13 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         title: const Text('Error'),
         content: Text(message),
         actions: [
           TextButton(
             child: const Text('OK'),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(ctx),
           ),
         ],
       ),
@@ -66,15 +66,25 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AddMenuPage(
+        builder: (_) => MenuItemForm(
           restaurantId: widget.restaurantId,
+          onMenuUpdated: _fetchMenuItems,
         ),
       ),
-    ).then((value) {
-      if (value == true) {
-        _fetchMenuItems(); // Refresh daftar menu setelah berhasil menambah
-      }
-    });
+    );
+  }
+
+  void _navigateToEditMenu(MenuItem menuItem) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MenuItemForm(
+          restaurantId: widget.restaurantId,
+          menuItemId: menuItem.id,
+          onMenuUpdated: _fetchMenuItems,
+        ),
+      ),
+    );
   }
 
   @override
@@ -89,7 +99,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
           : ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: menuItems.length,
-              itemBuilder: (context, index) {
+              itemBuilder: (ctx, index) {
                 final item = menuItems[index];
                 return Card(
                   elevation: 2,
@@ -159,21 +169,5 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
         ),
       ),
     );
-  }
-
-  void _navigateToEditMenu(MenuItem menuItem) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AddMenuPage(
-          restaurantId: widget.restaurantId,
-          menuItemId: menuItem.id, // Tambahkan menuItemId untuk pengeditan
-        ),
-      ),
-    ).then((value) {
-      if (value == true) {
-        _fetchMenuItems(); // Refresh daftar menu setelah berhasil diperbarui
-      }
-    });
   }
 }

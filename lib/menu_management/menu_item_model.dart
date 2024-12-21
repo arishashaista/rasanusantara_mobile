@@ -1,14 +1,12 @@
 class MenuItem {
   final String id;
   final String name;
-  
-  final List<String> categories; // Tambahkan properti ini
+  final List<String> categories;
 
   MenuItem({
     required this.id,
     required this.name,
-    
-    required this.categories, // Tambahkan parameter ini di constructor
+    required this.categories,
   });
 
   factory MenuItem.fromJson(Map<String, dynamic> json) {
@@ -17,7 +15,7 @@ class MenuItem {
       name: json['name'] ?? '',
       categories: json['categories'] != null
           ? List<String>.from(json['categories'])
-          : [], // Pastikan ini menangkap daftar kategori dari JSON
+          : [],
     );
   }
 
@@ -25,8 +23,7 @@ class MenuItem {
     return {
       'id': id,
       'name': name,
-      
-      'categories': categories, // Pastikan ini disertakan saat di-encode ke JSON
+      'categories': categories,
     };
   }
 }
