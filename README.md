@@ -20,7 +20,7 @@
 | Muhammad Rayyan Wiradana | 2306275342 |
 
 ## URL Deployment
-🔗 Tautan Aplikasi: 
+🔗 Tautan Aplikasi: [Aplikasi Rasa Nusantara](https://install.appcenter.ms/orgs/rasa-nusantara/apps/rasa-nusantara/distribution_groups/public/releases/1)
 
 ## Desain Aplikasi
 🔗 Tautan Desain: [Desain Aplikasi Rasa Nusantara](https://www.figma.com/design/RlIclSyvjBlbz1yGiJPcsl/TK-PAS-PBP?node-id=16-6&t=tWWgGXlHY2D7wcX5-1)

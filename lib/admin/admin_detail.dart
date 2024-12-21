@@ -194,10 +194,11 @@ class _AdminDetailState extends State<AdminDetail> {
                               ),
                             );
 
-                            // Check if shouldRefresh is true and reload data
+                            // Check if shouldRefresh is true and refresh the page
                             if (shouldRefresh == true) {
                               setState(() {
-                                _isLoading = true; // Tampilkan loading
+                                // Show loading indicator
+                                _isLoading = true;
                               });
 
                               // Fetch updated restaurant data
@@ -208,6 +209,11 @@ class _AdminDetailState extends State<AdminDetail> {
                                 final response = await request.get(
                                   'http://127.0.0.1:8000/json/${widget.restaurant.id}/',
                                 );
+
+                                print(
+                                    'Response body: $response'); // Debugging output
+
+                                // Parsing list of menu items
                                 final updatedMenuItems = (response as List)
                                     .map((menuItem) =>
                                         MenuItem.fromJson(menuItem))
@@ -215,18 +221,19 @@ class _AdminDetailState extends State<AdminDetail> {
 
                                 setState(() {
                                   widget.restaurant.menuItems =
-                                      updatedMenuItems; // Update menu items
-                                  _isLoading = false; // Hentikan loading
+                                      updatedMenuItems;
+                                  _isLoading = false; // Stop loading indicator
                                 });
                               } catch (e) {
+                                print('Error: $e'); // Debugging error
                                 setState(() {
                                   _isLoading =
-                                      false; // Hentikan loading meskipun terjadi error
+                                      false; // Stop loading indicator even on error
                                 });
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
+                                  SnackBar(
                                     content: Text(
-                                        'Gagal memperbarui data restaurant.'),
+                                        'Gagal memperbarui data restaurant: $e'),
                                   ),
                                 );
                               }
