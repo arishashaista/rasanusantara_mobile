@@ -78,34 +78,50 @@ class AdminCard extends StatelessWidget {
                       ),
                       if (restaurant.menuItems.isNotEmpty &&
                           restaurant.menuItems.first.categories.isNotEmpty)
-                        Wrap(
-                          spacing: 6,
-                          runSpacing: 4,
-                          children: restaurant.menuItems.first.categories
-                              .map((category) {
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Colors.orange.shade200,
-                                    Colors.orange,
-                                  ],
+                        SizedBox(
+                          height: 24, // Fixed height for single line
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(width: 6),
+                            itemCount: restaurant.menuItems
+                                .expand((menuItem) => menuItem.categories)
+                                .toSet()
+                                .length,
+                            itemBuilder: (context, index) {
+                              final categories = restaurant.menuItems
+                                  .expand((menuItem) => menuItem.categories)
+                                  .toSet()
+                                  .toList();
+
+                              if (index >= categories.length)
+                                return const SizedBox();
+
+                              return Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.orange.shade200,
+                                      Colors.orange,
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                category,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 11,
-                                  fontFamily: 'Montserrat',
-                                  fontWeight: FontWeight.bold,
+                                child: Text(
+                                  categories[index],
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontFamily: 'Montserrat',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ),
-                            );
-                          }).toList(),
+                              );
+                            },
+                          ),
                         ),
                       Row(
                         children: [

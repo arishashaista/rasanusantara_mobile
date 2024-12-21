@@ -8,11 +8,11 @@ class MenuItemForm extends StatefulWidget {
   final VoidCallback onMenuUpdated;
 
   const MenuItemForm({
-    super.key,
+    Key? key,
     required this.restaurantId,
     this.menuItemId,
     required this.onMenuUpdated,
-  });
+  }) : super(key: key);
 
   @override
   _MenuItemFormState createState() => _MenuItemFormState();
@@ -40,38 +40,6 @@ class _MenuItemFormState extends State<MenuItemForm> {
   @override
   void initState() {
     super.initState();
-    if (widget.menuItemId != null) {
-      _fetchMenuItem();
-    }
-  }
-
-  Future<void> _fetchMenuItem() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    final url = Uri.parse(
-        'http://127.0.0.1:8000/adminview/admin_menu/edit/${widget.restaurantId}/${widget.menuItemId}/');
-    try {
-      print('Fetching menu item from: $url'); // Debugging
-      final response = await http.get(url);
-      print('Response status: ${response.statusCode}'); // Debugging
-      print('Response body: ${response.body}'); // Debugging
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        _nameController.text = data['name'];
-        _selectedCategories = List<String>.from(data['categories']);
-      } else {
-        throw Exception('Failed to fetch menu item.');
-      }
-    } catch (e) {
-      print('Error fetching menu item: $e'); // Debugging
-      _showErrorDialog('Failed to fetch menu item: $e');
-    }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   Future<void> _submitForm() async {
@@ -82,18 +50,16 @@ class _MenuItemFormState extends State<MenuItemForm> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
+    // Inilah hal utama: endpoint API JSON
     final url = widget.menuItemId == null
         ? Uri.parse(
-            'http://127.0.0.1:8000/adminview/admin_menu/add/${widget.restaurantId}/')
+            'http://127.0.0.1:8000/adminview/api/menu_items/add/${widget.restaurantId}/')
         : Uri.parse(
-            'http://127.0.0.1:8000/adminview/admin_menu/edit/${widget.restaurantId}/${widget.menuItemId}/');
+            'http://127.0.0.1:8000/adminview/api/menu_items/edit/${widget.restaurantId}/${widget.menuItemId}/');
 
     try {
-      print('Submitting form to: $url'); // Debugging
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -102,41 +68,38 @@ class _MenuItemFormState extends State<MenuItemForm> {
           'categories': _selectedCategories,
         }),
       );
-      print('Response status: ${response.statusCode}'); // Debugging
-      print('Response body: ${response.body}'); // Debugging
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(widget.menuItemId == null
-                  ? 'Menu berhasil ditambahkan!'
-                  : 'Menu berhasil diperbarui!')),
+            content: Text(widget.menuItemId == null
+                ? 'Menu berhasil ditambahkan!'
+                : 'Menu berhasil diperbarui!'),
+          ),
         );
-        widget.onMenuUpdated();
-        Navigator.pop(context);
+        widget.onMenuUpdated(); // Refresh list di screen sebelumnya
+        Navigator.pop(context, true); // Close form
       } else {
-        throw Exception('Gagal menyimpan data menu.');
+        throw Exception(
+            'Gagal menyimpan data menu. Code: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error saving menu item: $e'); // Debugging
       _showErrorDialog('Gagal menyimpan data menu: $e');
     }
 
-    setState(() {
-      _isLoading = false;
-    });
+    setState(() => _isLoading = false);
   }
 
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         title: const Text('Error'),
         content: Text(message),
         actions: [
           TextButton(
             child: const Text('OK'),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(ctx),
           ),
         ],
       ),
@@ -163,9 +126,11 @@ class _MenuItemFormState extends State<MenuItemForm> {
                       decoration: const InputDecoration(labelText: 'Nama Menu'),
                     ),
                     const SizedBox(height: 12),
-                    const Text('Pilih Kategori',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    const Text(
+                      'Pilih Kategori',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
                     Wrap(
                       spacing: 8,
                       children: _allowedCategories.map((category) {
@@ -195,7 +160,9 @@ class _MenuItemFormState extends State<MenuItemForm> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange,
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 16),
+                            horizontal: 32,
+                            vertical: 16,
+                          ),
                         ),
                         child: Text(widget.menuItemId == null
                             ? 'Tambah Menu'

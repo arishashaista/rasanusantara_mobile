@@ -18,6 +18,7 @@ class AdminDetail extends StatefulWidget {
 }
 
 class _AdminDetailState extends State<AdminDetail> {
+  bool _isLoading = false;
   @override
   void initState() {
     super.initState();
@@ -111,12 +112,14 @@ class _AdminDetailState extends State<AdminDetail> {
                       ),
                     ],
                   ),
-                  if (widget.restaurant.menuItems.isNotEmpty &&
-                      widget.restaurant.menuItems.first.categories.isNotEmpty)
+                  if (widget.restaurant.menuItems.isNotEmpty)
                     Wrap(
                       spacing: 6,
                       runSpacing: 4,
-                      children: widget.restaurant.menuItems.first.categories
+                      children: widget.restaurant.menuItems
+                          .expand((menuItem) =>
+                              menuItem.categories) // Gabungkan semua kategori
+                          .toSet() // Hapus kategori duplikat
                           .map((category) {
                         return Container(
                           padding: const EdgeInsets.symmetric(
@@ -180,8 +183,9 @@ class _AdminDetailState extends State<AdminDetail> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
+                          onPressed: () async {
+                            // Navigate to MenuManagementScreen and wait for the result
+                            final shouldRefresh = await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => MenuManagementScreen(
@@ -189,6 +193,44 @@ class _AdminDetailState extends State<AdminDetail> {
                                 ),
                               ),
                             );
+
+                            // Check if shouldRefresh is true and reload data
+                            if (shouldRefresh == true) {
+                              setState(() {
+                                _isLoading = true; // Tampilkan loading
+                              });
+
+                              // Fetch updated restaurant data
+                              try {
+                                final request = Provider.of<CookieRequest>(
+                                    context,
+                                    listen: false);
+                                final response = await request.get(
+                                  'http://127.0.0.1:8000/json/${widget.restaurant.id}/',
+                                );
+                                final updatedMenuItems = (response as List)
+                                    .map((menuItem) =>
+                                        MenuItem.fromJson(menuItem))
+                                    .toList();
+
+                                setState(() {
+                                  widget.restaurant.menuItems =
+                                      updatedMenuItems; // Update menu items
+                                  _isLoading = false; // Hentikan loading
+                                });
+                              } catch (e) {
+                                setState(() {
+                                  _isLoading =
+                                      false; // Hentikan loading meskipun terjadi error
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        'Gagal memperbarui data restaurant.'),
+                                  ),
+                                );
+                              }
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange.shade900,

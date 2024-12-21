@@ -174,23 +174,30 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
                     children: [
-                      Flexible(
+                      Expanded(
                         child: DropdownButtonFormField<String>(
-                            value: _selectedCategory,
-                            decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 12),
-                              filled: true,
-                              fillColor: Colors.orange,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide: BorderSide.none,
-                              ),
+                          value: _selectedCategory,
+                          decoration: InputDecoration(
+                            isDense:
+                                true, // Menggunakan layout yang lebih compact
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 8,
                             ),
-                            dropdownColor: Colors.orange[100],
-                            items: _categories.map((category) {
-                              return DropdownMenuItem(
-                                value: category,
+                            filled: true,
+                            fillColor: Colors.orange,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          dropdownColor: Colors.orange[100],
+                          items: _categories.map((category) {
+                            return DropdownMenuItem(
+                              value: category,
+                              child: Container(
+                                constraints: const BoxConstraints(
+                                    maxWidth: 120), // Batasi lebar item
                                 child: Text(
                                   category,
                                   style: const TextStyle(
@@ -199,60 +206,78 @@ class _RestaurantListPageState extends State<RestaurantListPage> {
                                     fontFamily: 'Montserrat',
                                   ),
                                   maxLines: 1,
-                                  overflow: TextOverflow
-                                      .ellipsis, // Menyediakan overflow teks
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              if (value != null) {
-                                setState(() {
-                                  _selectedCategory = value;
-                                  _applyFilters();
-                                });
-                              }
-                            },
-                            menuMaxHeight: 200),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                _selectedCategory = value;
+                                _applyFilters();
+                              });
+                            }
+                          },
+                          icon: const Icon(Icons.arrow_drop_down,
+                              color: Colors.white, size: 20),
+                          menuMaxHeight: 200,
+                          isExpanded:
+                              true, // Memastikan dropdown mengisi ruang yang tersedia
+                        ),
                       ),
                       const SizedBox(width: 8),
-                      Flexible(
+                      Expanded(
                         child: DropdownButtonFormField<String>(
-                            value: _selectedSortOption,
-                            decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 12),
-                              filled: true,
-                              fillColor: Colors.orange,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide: BorderSide.none,
-                              ),
+                          value: _selectedSortOption,
+                          decoration: InputDecoration(
+                            isDense:
+                                true, // Menggunakan layout yang lebih compact
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 8,
                             ),
-                            dropdownColor: Colors.orange.shade100,
-                            items: _sortOptions.map((option) {
-                              return DropdownMenuItem(
-                                value: option,
+                            filled: true,
+                            fillColor: Colors.orange,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          dropdownColor: Colors.orange.shade100,
+                          items: _sortOptions.map((option) {
+                            return DropdownMenuItem(
+                              value: option,
+                              child: Container(
+                                constraints: const BoxConstraints(
+                                    maxWidth: 120), // Batasi lebar item
                                 child: Text(
                                   option,
                                   style: const TextStyle(
-                                      fontFamily: 'Montserrat',
-                                      color: Colors.white,
-                                      fontSize: 12),
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontFamily: 'Montserrat',
+                                  ),
                                   maxLines: 1,
-                                  overflow: TextOverflow
-                                      .ellipsis, // Menyediakan overflow teks
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              if (value != null) {
-                                setState(() {
-                                  _selectedSortOption = value;
-                                  _applyFilters();
-                                });
-                              }
-                            },
-                            menuMaxHeight: 200),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                _selectedSortOption = value;
+                                _applyFilters();
+                              });
+                            }
+                          },
+                          icon: const Icon(Icons.arrow_drop_down,
+                              color: Colors.white, size: 20),
+                          menuMaxHeight: 200,
+                          isExpanded:
+                              true, // Memastikan dropdown mengisi ruang yang tersedia
+                        ),
                       ),
                     ],
                   ),

@@ -145,13 +145,14 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                           ),
                         ],
                       ),
-                      if (widget.restaurant.menuItems.isNotEmpty &&
-                          widget
-                              .restaurant.menuItems.first.categories.isNotEmpty)
+                      if (widget.restaurant.menuItems.isNotEmpty)
                         Wrap(
                           spacing: 6,
                           runSpacing: 4,
-                          children: widget.restaurant.menuItems.first.categories
+                          children: widget.restaurant.menuItems
+                              .expand((menuItem) => menuItem
+                                  .categories) // Gabungkan semua kategori
+                              .toSet() // Hapus kategori duplikat
                               .map((category) {
                             return Container(
                               padding: const EdgeInsets.symmetric(
@@ -227,8 +228,10 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () async {
-                                final request = Provider.of<CookieRequest>(context, listen: false);
-                                
+                                final request = Provider.of<CookieRequest>(
+                                    context,
+                                    listen: false);
+
                                 // Cek status login
                                 if (!request.loggedIn) {
                                   // Jika belum login, tampilkan dialog dan redirect ke login page
@@ -236,17 +239,20 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                                     context: context,
                                     builder: (context) => AlertDialog(
                                       title: const Text('Login Required'),
-                                      content: const Text('Login untuk menambahkan review'),
+                                      content: const Text(
+                                          'Login untuk menambahkan review'),
                                       actions: [
                                         TextButton(
                                           onPressed: () {
                                             Navigator.pop(context);
-                                            Navigator.pushNamed(context, '/login');
+                                            Navigator.pushNamed(
+                                                context, '/login');
                                           },
                                           child: const Text('Login'),
                                         ),
                                         TextButton(
-                                          onPressed: () => Navigator.pop(context),
+                                          onPressed: () =>
+                                              Navigator.pop(context),
                                           child: const Text('Cancel'),
                                         ),
                                       ],
