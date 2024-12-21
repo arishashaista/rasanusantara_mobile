@@ -8,12 +8,8 @@ class MenuService {
   // Fetch menu items
   static Future<List<MenuItem>> fetchMenuItems(String restaurantId) async {
     final url = Uri.parse('$baseUrl/$restaurantId/');
-    print('Fetching menu items from: $url'); // Debugging
 
     final response = await http.get(url);
-
-    print('Response status: ${response.statusCode}'); // Debugging
-    print('Response body: ${response.body}'); // Debugging
 
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
@@ -27,13 +23,13 @@ class MenuService {
   static Future<void> addMenuItem(
       String restaurantId, String name, List<String> categories) async {
     final url = Uri.parse('$baseUrl/add/$restaurantId/');
-    print('Adding menu item to: $url'); // Debugging
-    print('Request body: ${jsonEncode({
-          'name': name,
-          'categories': categories
-        })}'); // Debugging
+    print('Adding menu item to: $url');
 
     try {
+      print('Request Body: ${jsonEncode({
+            'name': name,
+            'categories': categories
+          })}');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -42,15 +38,15 @@ class MenuService {
           'categories': categories,
         }),
       );
-      print('Response status: ${response.statusCode}'); // Debugging
-      print('Response body: ${response.body}'); // Debugging
 
-      if (response.statusCode != 201) {
-        print('Error adding menu item: ${response.body}'); // Debugging
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
         throw Exception('Failed to add menu item: ${response.body}');
       }
     } catch (e) {
-      print('Exception in addMenuItem: $e'); // Debugging
+      print('Error in addMenuItem: $e');
       rethrow;
     }
   }
@@ -59,30 +55,23 @@ class MenuService {
   static Future<void> editMenuItem(String restaurantId, String menuItemId,
       String name, List<String> categories) async {
     final url = Uri.parse('$baseUrl/edit/$restaurantId/$menuItemId/');
-    print('Editing menu item at: $url'); // Debugging
-    print('Request body: ${jsonEncode({
-          'name': name,
-          'categories': categories
-        })}'); // Debugging
+    print('Editing menu item at: $url');
 
     try {
-      final response = await http.put(
-        url,
+      final response = await http.post(
+        url, // Gunakan POST karena di server Anda menggunakan POST
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'name': name,
           'categories': categories,
         }),
       );
-      print('Response status: ${response.statusCode}'); // Debugging
-      print('Response body: ${response.body}'); // Debugging
 
       if (response.statusCode != 200) {
-        print('Error editing menu item: ${response.body}'); // Debugging
         throw Exception('Failed to edit menu item: ${response.body}');
       }
     } catch (e) {
-      print('Exception in editMenuItem: $e'); // Debugging
+      print('Error in editMenuItem: $e');
       rethrow;
     }
   }
@@ -91,19 +80,16 @@ class MenuService {
   static Future<void> deleteMenuItem(
       String restaurantId, String menuItemId) async {
     final url = Uri.parse('$baseUrl/delete/$restaurantId/$menuItemId/');
-    print('Deleting menu item at: $url'); // Debugging
+    print('Deleting menu item at: $url');
 
     try {
       final response = await http.delete(url);
-      print('Response status: ${response.statusCode}'); // Debugging
-      print('Response body: ${response.body}'); // Debugging
 
       if (response.statusCode != 200) {
-        print('Error deleting menu item: ${response.body}'); // Debugging
         throw Exception('Failed to delete menu item: ${response.body}');
       }
     } catch (e) {
-      print('Exception in deleteMenuItem: $e'); // Debugging
+      print('Error in deleteMenuItem: $e');
       rethrow;
     }
   }

@@ -22,9 +22,14 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     _fetchMenuItems();
   }
 
-  Future<void> _fetchMenuItems() async {
+  void _fetchMenuItems() async {
+    setState(() {
+      isLoading = true;
+    });
+
     try {
-      List<MenuItem> items = await MenuService.fetchMenuItems(widget.restaurantId);
+      List<MenuItem> items =
+          await MenuService.fetchMenuItems(widget.restaurantId);
       setState(() {
         menuItems = items;
         isLoading = false;
@@ -146,8 +151,8 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     );
   }
 
-  void _navigateToAddMenu() {
-    Navigator.push(
+  void _navigateToAddMenu() async {
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => MenuItemForm(
@@ -156,18 +161,22 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
         ),
       ),
     );
+    // Refresh menu items after returning from the form
+    _fetchMenuItems();
   }
 
- void _navigateToEditMenu(MenuItem menuItem) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => MenuItemForm(
-        restaurantId: widget.restaurantId,
-        menuItemId: menuItem.id, // Ganti menuItem ke menuItemId
-        onMenuUpdated: _fetchMenuItems,
+  void _navigateToEditMenu(MenuItem menuItem) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MenuItemForm(
+          restaurantId: widget.restaurantId,
+          menuItemId: menuItem.id,
+          onMenuUpdated: _fetchMenuItems,
+        ),
       ),
-    ),
-  );
-}
+    );
+    // Refresh menu items after returning from the form
+    _fetchMenuItems();
+  }
 }
