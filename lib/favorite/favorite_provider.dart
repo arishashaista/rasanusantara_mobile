@@ -4,27 +4,39 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 
 class FavoriteProvider extends ChangeNotifier {
   final Set<String> _favoriteIds = {};
+  List<dynamic> _favoriteRestaurants = [];
   bool _isInitialized = false;
 
   bool get isInitialized => _isInitialized;
+  List<dynamic> get favoriteRestaurants => _favoriteRestaurants;
 
-  bool isFavorite(String restaurantId) => _favoriteIds.contains(restaurantId);
+  bool isFavorite(String? restaurantId) {
+    if (restaurantId == null) return false;
+    return _favoriteIds.contains(restaurantId);
+  }
 
   Future<void> initializeFavorites(CookieRequest request) async {
     try {
       if (request.loggedIn) {
         final response =
             await request.get('http://127.0.0.1:8000/favorite/json/');
-        if (response != null) {
+        debugPrint('Favorite response: $response');
+        if (response != null && response is List) {
           _favoriteIds.clear();
+          _favoriteRestaurants = response;
           for (var fav in response) {
-            _favoriteIds.add(fav['id'].toString());
+            if (fav['id'] != null) {
+              _favoriteIds.add(fav['id'].toString());
+              debugPrint('Added favorite ID: ${fav['id']}');
+            } else {
+              debugPrint('Favorite item with null ID encountered.');
+            }
           }
           _isInitialized = true;
-          notifyListeners(); // Beri tahu listener bahwa data telah diperbarui
+          notifyListeners();
         }
       } else {
-        resetFavorites(); // Jika tidak login, reset data favorit
+        resetFavorites();
       }
     } catch (e) {
       debugPrint('Error initializing favorites: $e');
@@ -32,10 +44,15 @@ class FavoriteProvider extends ChangeNotifier {
   }
 
   Future<void> toggleFavorite(
-    String restaurantId,
+    String? restaurantId,
     CookieRequest request,
     BuildContext context,
   ) async {
+    if (restaurantId == null) {
+      _showErrorDialog(context, 'Invalid restaurant ID.');
+      return;
+    }
+
     if (!request.loggedIn) {
       _showLoginAlert(context);
       return;
@@ -46,15 +63,23 @@ class FavoriteProvider extends ChangeNotifier {
         'http://127.0.0.1:8000/favorite/toggle-favorite/',
         jsonEncode({'restaurant_id': restaurantId}),
       );
+      debugPrint('Toggle favorite response: $response');
 
       if (response is Map<String, dynamic> && response['success'] == true) {
-        await initializeFavorites(
-            request); // Sinkronisasi ulang data setelah toggle
+        if (_favoriteIds.contains(restaurantId)) {
+          _favoriteIds.remove(restaurantId);
+          _favoriteRestaurants.removeWhere(
+              (restaurant) => restaurant['id'].toString() == restaurantId);
+        } else {
+          _favoriteIds.add(restaurantId);
+        }
+        notifyListeners();
       } else {
         throw Exception(
             response['message'] ?? 'Failed to update favorite status');
       }
     } catch (e) {
+      debugPrint('Error toggling favorite: $e');
       if (context.mounted) {
         _showErrorDialog(context, 'Failed to connect to the server: $e');
       }
@@ -63,8 +88,9 @@ class FavoriteProvider extends ChangeNotifier {
 
   void resetFavorites() {
     _favoriteIds.clear();
+    _favoriteRestaurants.clear();
     _isInitialized = false;
-    notifyListeners(); // Beri tahu listener bahwa data telah dihapus
+    notifyListeners();
   }
 
   void _showLoginAlert(BuildContext context) {

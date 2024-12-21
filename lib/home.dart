@@ -224,72 +224,6 @@ class _MenuPageState extends State<MenuPage> {
     );
   }
 
-  // Widget _buildSearchResults() {
-  //   return Container(
-  //     padding: const EdgeInsets.all(8),
-  //     decoration: BoxDecoration(
-  //       color: Colors.white,
-  //       borderRadius: BorderRadius.circular(12),
-  //       boxShadow: const [
-  //         BoxShadow(
-  //           color: Colors.black12,
-  //           blurRadius: 5,
-  //           offset: Offset(0, 3),
-  //         ),
-  //       ],
-  //     ),
-  //     child: ListView.builder(
-  //       shrinkWrap: true,
-  //       physics: const NeverScrollableScrollPhysics(),
-  //       itemCount: _searchResults.length,
-  //       itemBuilder: (context, index) {
-  //         final restaurant = _searchResults[index];
-  //         return ListTile(
-  //           leading: ClipRRect(
-  //             borderRadius: BorderRadius.circular(8),
-  //             child: Image.network(
-  //               restaurant.image,
-  //               width: 50,
-  //               height: 50,
-  //               fit: BoxFit.cover,
-  //             ),
-  //           ),
-  //           title: Text(
-  //             restaurant.name,
-  //             style: const TextStyle(
-  //               fontWeight: FontWeight.bold,
-  //               fontSize: 14,
-  //               fontFamily: 'Montserrat',
-  //             ),
-  //             maxLines: 1,
-  //             overflow: TextOverflow.ellipsis,
-  //           ),
-  //           subtitle: Text(
-  //             restaurant.location,
-  //             style: const TextStyle(
-  //               fontSize: 12,
-  //               color: Colors.grey,
-  //               fontFamily: 'Montserrat',
-  //             ),
-  //             maxLines: 1,
-  //             overflow: TextOverflow.ellipsis,
-  //           ),
-  //           onTap: () {
-  //             Navigator.push(
-  //               context,
-  //               MaterialPageRoute(
-  //                 builder: (context) => RestaurantDetailPage(
-  //                   restaurant: restaurant,
-  //                 ),
-  //               ),
-  //             );
-  //           },
-  //         );
-  //       },
-  //     ),
-  //   );
-  // }
-
   Widget _buildSearchResultsOverlay() {
     return Container(
       padding: const EdgeInsets.all(8),
@@ -315,7 +249,9 @@ class _MenuPageState extends State<MenuPage> {
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.network(
-                restaurant.image,
+                restaurant.image.isNotEmpty
+                    ? restaurant.image
+                    : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhdkA-pOR1l5lRdCAtAAA2XSt2qg-WxQcg5A&s',
                 width: 50,
                 height: 50,
                 fit: BoxFit.cover,
