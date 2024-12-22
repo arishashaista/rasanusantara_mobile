@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:rasanusantara_mobile/admin/delete_restaurant.dart';
+import 'package:rasanusantara_mobile/admin/edit_restaurant.dart';
 import 'package:rasanusantara_mobile/restaurant.dart';
 import 'package:rasanusantara_mobile/review/screens/review_page.dart';
-import 'package:rasanusantara_mobile/admin/edit_restaurant.dart';
-import 'package:rasanusantara_mobile/admin/delete_restaurant.dart';
 import 'package:rasanusantara_mobile/menu_management/menu_management_screen.dart';
 
 class AdminDetail extends StatefulWidget {
@@ -119,66 +119,6 @@ class _AdminDetailState extends State<AdminDetail> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            final result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => EditRestaurantPage(
-                                  restaurantId: widget.restaurant.id,
-                                  name: widget.restaurant.name,
-                                  location: widget.restaurant.location,
-                                  averagePrice: widget.restaurant.averagePrice,
-                                  rating: widget.restaurant.rating,
-                                ),
-                              ),
-                            );
-                            if (result == true) {
-                              setState(() {});
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange.shade700,
-                            foregroundColor: Colors.white,
-                          ),
-                          child: const Text(
-                            'Edit Info',
-                            style: TextStyle(
-                              fontFamily: 'Montserrat',
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            final result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DeleteRestaurantPage(
-                                  restaurantId: widget.restaurant.id,
-                                ),
-                              ),
-                            );
-                            if (result == true) {
-                              Navigator.pop(context, true);
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
-                          ),
-                          child: const Text(
-                            'Delete',
-                            style: TextStyle(
-                              fontFamily: 'Montserrat',
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                   Padding(
@@ -274,13 +214,31 @@ class _AdminDetailState extends State<AdminDetail> {
                           children: [
                             Expanded(
                               child: ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () async {
+                                  final shouldRefresh = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EditRestaurantPage(
+                                        restaurantId: widget.restaurant.id,
+                                        name: widget.restaurant.name,
+                                        location: widget.restaurant.location,
+                                        averagePrice:
+                                            widget.restaurant.averagePrice,
+                                        rating: widget.restaurant.rating,
+                                      ),
+                                    ),
+                                  );
+
+                                  if (shouldRefresh == true) {
+                                    await _loadData();
+                                  }
+                                },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.orange,
                                   foregroundColor: Colors.white,
                                 ),
                                 child: const Text(
-                                  'Reservasi',
+                                  'Edit Restoran',
                                   style: TextStyle(fontFamily: 'Montserrat'),
                                 ),
                               ),
@@ -312,6 +270,41 @@ class _AdminDetailState extends State<AdminDetail> {
                                   style: TextStyle(
                                     fontFamily: 'Montserrat',
                                   ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment
+                              .center, // Tambahkan agar tombol terpusat
+                          children: [
+                            SizedBox(
+                              width: 200, // Tentukan panjang tombol
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  final shouldRefresh = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          DeleteRestaurantPage(
+                                        restaurantId: widget.restaurant.id,
+                                      ),
+                                    ),
+                                  );
+
+                                  if (shouldRefresh == true) {
+                                    await _loadData();
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                ),
+                                child: const Text(
+                                  'Hapus Restoran',
+                                  style: TextStyle(fontFamily: 'Montserrat'),
                                 ),
                               ),
                             ),

@@ -55,9 +55,9 @@ class _MenuItemFormState extends State<MenuItemForm> {
     // Inilah hal utama: endpoint API JSON
     final url = widget.menuItemId == null
         ? Uri.parse(
-            'http://127.0.0.1:8000/adminview/api/menu_items/add/${widget.restaurantId}/')
+            'http://127.0.0.1:8000/ubahmenu/api/menu_items/add/${widget.restaurantId}/')
         : Uri.parse(
-            'http://127.0.0.1:8000/adminview/api/menu_items/edit/${widget.restaurantId}/${widget.menuItemId}/');
+            'http://127.0.0.1:8000/ubahmenu/api/menu_items/edit/${widget.restaurantId}/${widget.menuItemId}/');
 
     try {
       final response = await http.post(
@@ -77,8 +77,8 @@ class _MenuItemFormState extends State<MenuItemForm> {
                 : 'Menu berhasil diperbarui!'),
           ),
         );
-        widget.onMenuUpdated(); // Refresh list di screen sebelumnya
-        Navigator.pop(context, true); // Close form
+        widget.onMenuUpdated();
+        Navigator.pop(context, true);
       } else {
         throw Exception(
             'Gagal menyimpan data menu. Code: ${response.statusCode}');

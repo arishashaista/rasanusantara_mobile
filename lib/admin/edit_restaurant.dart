@@ -38,7 +38,8 @@ class _EditRestaurantPageState extends State<EditRestaurantPage> {
     super.initState();
     _nameController = TextEditingController(text: widget.name);
     _locationController = TextEditingController(text: widget.location);
-    _priceController = TextEditingController(text: widget.averagePrice.toString());
+    _priceController =
+        TextEditingController(text: widget.averagePrice.toString());
     _ratingController = TextEditingController(text: widget.rating.toString());
   }
 
@@ -56,7 +57,8 @@ class _EditRestaurantPageState extends State<EditRestaurantPage> {
 
     setState(() => _isLoading = true);
 
-    final url = Uri.parse('http://127.0.0.1:8000/adminview/edit-json/${widget.restaurantId}/');
+    final url = Uri.parse(
+        'http://127.0.0.1:8000/adminview/edit-json/${widget.restaurantId}/');
     try {
       final response = await http.post(
         url,
@@ -85,7 +87,8 @@ class _EditRestaurantPageState extends State<EditRestaurantPage> {
           MaterialPageRoute(builder: (_) => const Navbar()),
         );
       } else {
-        throw Exception(responseData['message'] ?? 'Failed to update restaurant');
+        throw Exception(
+            responseData['message'] ?? 'Failed to update restaurant');
       }
     } catch (e) {
       if (!mounted) return;

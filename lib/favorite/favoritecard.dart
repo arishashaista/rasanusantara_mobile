@@ -60,7 +60,9 @@ class _FavoriteProductCardState extends State<FavoriteProductCard> {
                     bottomLeft: Radius.circular(12),
                   ),
                   child: Image.network(
-                    widget.restaurant.image,
+                    widget.restaurant.image.isNotEmpty
+                        ? widget.restaurant.image
+                        : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhdkA-pOR1l5lRdCAtAAA2XSt2qg-WxQcg5A&s',
                     width: 110,
                     height: 100,
                     fit: BoxFit.cover,
