@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:provider/provider.dart';
+import 'package:rasanusantara_mobile/admin/navigation_provider.dart';
+import 'package:rasanusantara_mobile/navbar.dart';
 
 class DeleteRestaurantPage extends StatefulWidget {
   final String restaurantId;
@@ -22,25 +23,29 @@ class _DeleteRestaurantPageState extends State<DeleteRestaurantPage> {
   Future<void> _deleteRestaurant() async {
     setState(() => _isLoading = true);
 
+    final url = Uri.parse('http://127.0.0.1:8000/adminview/delete-json/${widget.restaurantId}/');
     try {
-      final url = Uri.parse('http://127.0.0.1:8000/adminview/delete-json/${widget.restaurantId}/');
-      
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
       );
-
       if (!mounted) return;
 
-      final responseData = jsonDecode(response.body);
-      
       if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(responseData['message'])),
         );
-        Navigator.pop(context, true);
+
+        // Update navigation and return to home with navbar
+        context.read<NavigationProvider>().setIndex(0);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Navbar()),
+        );
       } else {
-        throw Exception(responseData['message'] ?? 'Failed to delete restaurant');
+        final responseData = jsonDecode(response.body);
+        throw Exception(responseData['message'] ?? 'Failed to delete');
       }
     } catch (e) {
       if (!mounted) return;

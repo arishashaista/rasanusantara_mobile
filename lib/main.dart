@@ -5,11 +5,13 @@ import 'package:rasanusantara_mobile/navbar.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:rasanusantara_mobile/authentication/screens/login.dart';
+import 'package:rasanusantara_mobile/admin/navigation_provider.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => NavigationProvider()),
         Provider<CookieRequest>(
           create: (_) => CookieRequest(),
         ),
