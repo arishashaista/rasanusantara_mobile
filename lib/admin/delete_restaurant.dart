@@ -23,7 +23,8 @@ class _DeleteRestaurantPageState extends State<DeleteRestaurantPage> {
   Future<void> _deleteRestaurant() async {
     setState(() => _isLoading = true);
 
-    final url = Uri.parse('http://127.0.0.1:8000/adminview/delete-json/${widget.restaurantId}/');
+    final url = Uri.parse(
+        'http://127.0.0.1:8000/adminview/delete-json/${widget.restaurantId}/');
     try {
       final response = await http.post(
         url,
@@ -72,7 +73,8 @@ class _DeleteRestaurantPageState extends State<DeleteRestaurantPage> {
             : Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('Are you sure you want to delete this restaurant?'),
+                  const Text(
+                      'Are you sure you want to delete this restaurant?'),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: _deleteRestaurant,

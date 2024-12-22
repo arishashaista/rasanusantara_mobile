@@ -39,7 +39,9 @@ class RestaurantCard extends StatelessWidget {
                       bottomLeft: Radius.circular(12),
                     ),
                     child: Image.network(
-                      restaurant.image,
+                      restaurant.image.isNotEmpty
+                          ? restaurant.image
+                          : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhdkA-pOR1l5lRdCAtAAA2XSt2qg-WxQcg5A&s',
                       width: 110,
                       height: double.infinity,
                       fit: BoxFit.cover,

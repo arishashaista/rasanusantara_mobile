@@ -266,12 +266,18 @@ class _MenuPageState extends State<MenuPage> {
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.network(
-                restaurant.image.isNotEmpty
-                    ? restaurant.image
-                    : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhdkA-pOR1l5lRdCAtAAA2XSt2qg-WxQcg5A&s',
+                restaurant.image,
                 width: 50,
                 height: 50,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: 110,
+                    color: Colors.grey[300],
+                    child: const Icon(Icons.restaurant,
+                        color: Colors.grey, size: 20),
+                  );
+                },
               ),
             ),
             title: Text(
