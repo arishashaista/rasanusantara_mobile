@@ -3,6 +3,7 @@
 - [Profil Kelompok](#anggota-kelompok)
 - [Tautan Aplikasi](#url-deployment)
 - [Tautan Desain Aplikasi](#desain-aplikasi)
+- [Video Promosi](#video-promosi)
 - [Deskripsi Aplikasi](#deskripsi-aplikasi)
 - [Modul Aplikasi](#modul-aplikasi)
 - [Peran Pengguna](#peran-pengguna)
@@ -24,6 +25,9 @@
 
 ## Desain Aplikasi
 🔗 Tautan Desain: [Desain Aplikasi Rasa Nusantara](https://www.figma.com/design/RlIclSyvjBlbz1yGiJPcsl/TK-PAS-PBP?node-id=16-6&t=tWWgGXlHY2D7wcX5-1)
+
+## Video Promosi
+🔗 Tautan Video: [Video Promosi Aplikasi Rasa Nusantara](https://drive.google.com/file/d/1oLV9Bgg8F9bSY8smVie6DroJKhMEcwcd/view?usp=sharing)
 
 ## Deskripsi Aplikasi
 **Rasa Nusantara** adalah aplikasi mobile inovatif yang dirancang untuk memudahkan pengguna dalam menemukan dan mengeksplorasi berbagai makanan tradisional Indonesia yang berlokasi di Yogyakarta. Melalui aplikasi mobile ini, pengguna dapat dengan mudah mengakses informasi lengkap mengenai restoran yang ada di Yogyakarta, termasuk menu, lokasi, harga, dan ulasan dari pengguna lain.
