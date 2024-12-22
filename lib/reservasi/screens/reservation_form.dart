@@ -32,7 +32,7 @@ class _ReservationFormState extends State<ReservationForm> {
     if (_formKey.currentState!.validate()) {
       final request = context.read<CookieRequest>();
       final String url =
-          'http://127.0.0.1:8000/reservasi/create_reservation_flutter/${widget.restaurantid}/';
+          'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/reservasi/create_reservation_flutter/${widget.restaurantid}/';
 
       try {
         final response = await request.postJson(

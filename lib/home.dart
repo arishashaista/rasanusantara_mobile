@@ -26,7 +26,8 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   Future<void> fetchRestaurants() async {
-    final url = Uri.parse('http://127.0.0.1:8000/json/');
+    final url =
+        Uri.parse('https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/json/');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

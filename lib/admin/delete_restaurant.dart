@@ -24,7 +24,7 @@ class _DeleteRestaurantPageState extends State<DeleteRestaurantPage> {
     setState(() => _isLoading = true);
 
     final url = Uri.parse(
-        'http://127.0.0.1:8000/adminview/delete-json/${widget.restaurantId}/');
+        'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/adminview/delete-json/${widget.restaurantId}/');
     try {
       final response = await http.post(
         url,

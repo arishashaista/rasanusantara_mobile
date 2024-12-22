@@ -18,8 +18,8 @@ class FavoriteProvider extends ChangeNotifier {
   Future<void> initializeFavorites(CookieRequest request) async {
     try {
       if (request.loggedIn) {
-        final response =
-            await request.get('http://127.0.0.1:8000/favorite/json/');
+        final response = await request.get(
+            'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/favorite/json/');
         debugPrint('Favorite response: $response');
         if (response != null && response is List) {
           _favoriteIds.clear();
@@ -60,7 +60,7 @@ class FavoriteProvider extends ChangeNotifier {
 
     try {
       final response = await request.postJson(
-        'http://127.0.0.1:8000/favorite/toggle-favorite/',
+        'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/favorite/toggle-favorite/',
         jsonEncode({'restaurant_id': restaurantId}),
       );
       debugPrint('Toggle favorite response: $response');

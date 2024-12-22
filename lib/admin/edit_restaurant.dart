@@ -58,7 +58,7 @@ class _EditRestaurantPageState extends State<EditRestaurantPage> {
     setState(() => _isLoading = true);
 
     final url = Uri.parse(
-        'http://127.0.0.1:8000/adminview/edit-json/${widget.restaurantId}/');
+        'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/adminview/edit-json/${widget.restaurantId}/');
     try {
       final response = await http.post(
         url,

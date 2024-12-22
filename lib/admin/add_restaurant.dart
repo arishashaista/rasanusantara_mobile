@@ -32,7 +32,8 @@ class _AddRestaurantPageState extends State<AddRestaurantPage> {
       _isLoading = true;
     });
 
-    final url = Uri.parse('http://127.0.0.1:8000/adminview/add-json/');
+    final url = Uri.parse(
+        'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/adminview/add-json/');
 
     try {
       final response = await http.post(

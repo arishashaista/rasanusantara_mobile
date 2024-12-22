@@ -31,7 +31,8 @@ class _ReviewPageState extends State<ReviewPage> {
 
   Future<void> getCurrentUsername() async {
     final request = context.read<CookieRequest>();
-    final response = await request.get('http://127.0.0.1:8000/reviews/get_username/');
+    final response = await request.get(
+        'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/reviews/get_username/');
     setState(() {
       currentUsername = response['username'];
     });
@@ -41,7 +42,7 @@ class _ReviewPageState extends State<ReviewPage> {
     final request = context.read<CookieRequest>();
     try {
       final response = await request.post(
-        'http://127.0.0.1:8000/reviews/create-review-flutter/',
+        'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/reviews/create-review-flutter/',
         {
           'restaurant_name': widget.restaurantName,
           'rating': _rating.toInt().toString(),
@@ -89,13 +90,13 @@ class _ReviewPageState extends State<ReviewPage> {
     final request = context.read<CookieRequest>();
     try {
       final response = await request.get(
-        'http://127.0.0.1:8000/reviews/get-restaurant-reviews/${Uri.encodeComponent(widget.restaurantName)}/',
+        'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/reviews/get-restaurant-reviews/${Uri.encodeComponent(widget.restaurantName)}/',
       );
-      
+
       if (response is String) {
         throw Exception('Invalid response format');
       }
-      
+
       List<Review> reviews = [];
       for (var d in response) {
         if (d != null) {
@@ -105,7 +106,7 @@ class _ReviewPageState extends State<ReviewPage> {
       return reviews;
     } catch (e) {
       if (!context.mounted) return [];
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Gagal memuat review: $e'),
@@ -120,7 +121,7 @@ class _ReviewPageState extends State<ReviewPage> {
     final request = context.read<CookieRequest>();
     try {
       final response = await request.post(
-        'http://127.0.0.1:8000/reviews/delete-review-flutter/$reviewId/',
+        'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/reviews/delete-review-flutter/$reviewId/',
         {
           'review_id': reviewId.toString(),
         },
@@ -158,7 +159,7 @@ class _ReviewPageState extends State<ReviewPage> {
     final request = context.read<CookieRequest>();
     try {
       final response = await request.post(
-        'http://127.0.0.1:8000/reviews/edit-review-flutter/$reviewId/',
+        'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/reviews/edit-review-flutter/$reviewId/',
         {
           'rating': rating.toInt().toString(),
           'comment': comment,
@@ -195,7 +196,8 @@ class _ReviewPageState extends State<ReviewPage> {
 
   void showEditReviewModal(Review review) {
     double editRating = review.fields.rating.toDouble();
-    final editCommentController = TextEditingController(text: review.fields.comment);
+    final editCommentController =
+        TextEditingController(text: review.fields.comment);
 
     showDialog(
       context: context,
@@ -273,7 +275,7 @@ class _ReviewPageState extends State<ReviewPage> {
               ),
             ),
             SizedBox(height: 20),
-            
+
             // Form Review
             Text(
               'Beri Rating',
@@ -313,27 +315,27 @@ class _ReviewPageState extends State<ReviewPage> {
               ),
               child: Text('Submit Review'),
             ),
-            
+
             SizedBox(height: 24),
-            
+
             // Daftar Review
             Text(
               'Semua Review',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16),
-            
+
             FutureBuilder<List<Review>>(
               future: fetchReviews(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
                 }
-                
+
                 if (snapshot.hasError) {
                   return Center(child: Text('Error loading reviews'));
                 }
-                
+
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return Center(
                     child: Text(
@@ -342,7 +344,7 @@ class _ReviewPageState extends State<ReviewPage> {
                     ),
                   );
                 }
-                
+
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
@@ -363,7 +365,8 @@ class _ReviewPageState extends State<ReviewPage> {
                                 Expanded(
                                   child: Text(
                                     review.fields.user,
-                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                 ),
                                 if (review.fields.user == currentUsername)
@@ -397,10 +400,8 @@ class _ReviewPageState extends State<ReviewPage> {
                               children: [
                                 ...List.generate(
                                   review.fields.rating,
-                                  (index) => Icon(Icons.star, 
-                                    color: Colors.amber, 
-                                    size: 16
-                                  ),
+                                  (index) => Icon(Icons.star,
+                                      color: Colors.amber, size: 16),
                                 ),
                               ],
                             ),

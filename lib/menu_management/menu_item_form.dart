@@ -55,9 +55,9 @@ class _MenuItemFormState extends State<MenuItemForm> {
     // Inilah hal utama: endpoint API JSON
     final url = widget.menuItemId == null
         ? Uri.parse(
-            'http://127.0.0.1:8000/ubahmenu/api/menu_items/add/${widget.restaurantId}/')
+            'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/ubahmenu/api/menu_items/add/${widget.restaurantId}/')
         : Uri.parse(
-            'http://127.0.0.1:8000/ubahmenu/api/menu_items/edit/${widget.restaurantId}/${widget.menuItemId}/');
+            'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/ubahmenu/api/menu_items/edit/${widget.restaurantId}/${widget.menuItemId}/');
 
     try {
       final response = await http.post(

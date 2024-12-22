@@ -29,7 +29,7 @@ class _ReservationUserPageState extends State<ReservationUserPage> {
     final request = context.read<CookieRequest>();
     try {
       final response = await request.get(
-        'http://127.0.0.1:8000/reservasi/json/',
+        'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/reservasi/json/',
       );
 
       setState(() {
@@ -52,15 +52,20 @@ class _ReservationUserPageState extends State<ReservationUserPage> {
 
     setState(() {
       filteredReservations = reservations.where((reservation) {
-        final restaurantName = reservation['fields']['restaurant'].toLowerCase();
-        final reservationDate = DateTime.parse(reservation['fields']['reservation_date']);
+        final restaurantName =
+            reservation['fields']['restaurant'].toLowerCase();
+        final reservationDate =
+            DateTime.parse(reservation['fields']['reservation_date']);
 
         bool matchesSearch = restaurantName.contains(searchQuery.toLowerCase());
 
         if (filter == 'Semua') return matchesSearch;
-        if (filter == 'Hari Ini') return matchesSearch && isSameDay(reservationDate, today);
-        if (filter == 'Akan Datang') return matchesSearch && reservationDate.isAfter(today);
-        if (filter == 'Terlewat') return matchesSearch && reservationDate.isBefore(today);
+        if (filter == 'Hari Ini')
+          return matchesSearch && isSameDay(reservationDate, today);
+        if (filter == 'Akan Datang')
+          return matchesSearch && reservationDate.isAfter(today);
+        if (filter == 'Terlewat')
+          return matchesSearch && reservationDate.isBefore(today);
 
         return matchesSearch;
       }).toList();
@@ -68,7 +73,9 @@ class _ReservationUserPageState extends State<ReservationUserPage> {
   }
 
   bool isSameDay(DateTime date1, DateTime date2) {
-    return date1.year == date2.year && date1.month == date2.month && date1.day == date2.day;
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
   }
 
   void navigateToEditPage(int reservationId, Map<String, dynamic> reservation) {
@@ -135,7 +142,8 @@ class _ReservationUserPageState extends State<ReservationUserPage> {
           Container(
             width: double.infinity,
             margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
             decoration: BoxDecoration(
               color: Colors.orange,
               borderRadius: BorderRadius.circular(20),
@@ -145,7 +153,8 @@ class _ReservationUserPageState extends State<ReservationUserPage> {
               icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
               isExpanded: true,
               dropdownColor: Colors.orange,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  color: Colors.white, fontWeight: FontWeight.bold),
               underline: SizedBox(),
               items: ['Semua', 'Hari Ini', 'Akan Datang', 'Terlewat']
                   .map((filterOption) => DropdownMenuItem(
@@ -171,11 +180,14 @@ class _ReservationUserPageState extends State<ReservationUserPage> {
                     : ListView.builder(
                         itemCount: filteredReservations.length,
                         itemBuilder: (context, index) {
-                          final reservation = filteredReservations[index]['fields'];
-                          final reservationId = filteredReservations[index]['pk'];
+                          final reservation =
+                              filteredReservations[index]['fields'];
+                          final reservationId =
+                              filteredReservations[index]['pk'];
 
                           return Card(
-                            margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 8.0),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -192,24 +204,34 @@ class _ReservationUserPageState extends State<ReservationUserPage> {
                                       width: 80,
                                       height: 80,
                                       color: Colors.grey[300],
-                                      child: const Icon(Icons.restaurant, color: Colors.grey),
+                                      child: const Icon(Icons.restaurant,
+                                          color: Colors.grey),
                                     );
                                   },
                                 ),
                               ),
-                              title: Text(reservation['restaurant'], style: const TextStyle(fontWeight: FontWeight.bold)),
+                              title: Text(reservation['restaurant'],
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold)),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
                                     children: [
                                       TextButton(
-                                        onPressed: () => navigateToEditPage(reservationId, reservation),
-                                        child: const Text('Edit', style: TextStyle(color: Colors.blue)),
+                                        onPressed: () => navigateToEditPage(
+                                            reservationId, reservation),
+                                        child: const Text('Edit',
+                                            style:
+                                                TextStyle(color: Colors.blue)),
                                       ),
                                       TextButton(
-                                        onPressed: () => navigateToDeletePage(reservationId, reservation['restaurant']),
-                                        child: const Text('Cancel', style: TextStyle(color: Colors.red)),
+                                        onPressed: () => navigateToDeletePage(
+                                            reservationId,
+                                            reservation['restaurant']),
+                                        child: const Text('Cancel',
+                                            style:
+                                                TextStyle(color: Colors.red)),
                                       ),
                                     ],
                                   ),

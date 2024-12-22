@@ -61,7 +61,8 @@ class _ProfileFavoriteState extends State<ProfileFavorite> {
 
   Future<void> fetchUserData(CookieRequest request) async {
     try {
-      final response = await request.get('http://127.0.0.1:8000/auth/user/');
+      final response = await request.get(
+          'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/auth/user/');
       if (mounted) {
         setState(() {
           username = response['username'] ?? 'Pengguna';
@@ -99,7 +100,8 @@ class _ProfileFavoriteState extends State<ProfileFavorite> {
         Provider.of<FavoriteProvider>(context, listen: false);
 
     try {
-      final response = await request.get('http://127.0.0.1:8000/auth/logout/');
+      final response = await request.get(
+          'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/auth/logout/');
 
       if (response['status'] == true) {
         request.loggedIn = false;

@@ -24,7 +24,7 @@ class ReservationDeletePage extends StatelessWidget {
 
     try {
       final response = await request.post(
-        'http://127.0.0.1:8000/reservasi/cancel/$reservationId/',
+        'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/reservasi/cancel/$reservationId/',
         {},
       );
 

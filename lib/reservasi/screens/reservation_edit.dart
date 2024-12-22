@@ -53,7 +53,7 @@ class _ReservationEditPageState extends State<ReservationEditPage> {
   Future<void> updateReservation() async {
     final request = context.read<CookieRequest>();
     final String url =
-        'http://127.0.0.1:8000/reservasi/edit_flutter/${widget.reservationId}/';
+        'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/reservasi/edit_flutter/${widget.reservationId}/';
 
     try {
       final response = await request.postJson(

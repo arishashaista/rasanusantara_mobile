@@ -54,7 +54,8 @@ class _AdminListPageState extends State<AdminListPage> {
 
   Future<void> fetchRestaurants(CookieRequest request) async {
     try {
-      final response = await request.get('http://127.0.0.1:8000/json/');
+      final response = await request
+          .get('https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/json/');
       List<Restaurant> listRestaurant = [];
       for (var d in response) {
         if (d != null) {

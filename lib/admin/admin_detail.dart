@@ -40,7 +40,7 @@ class _AdminDetailState extends State<AdminDetail> {
     try {
       final request = Provider.of<CookieRequest>(context, listen: false);
       final response = await request.get(
-        'http://127.0.0.1:8000/ubahmenu/api/menu_items/${widget.restaurant.id}/',
+        'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/ubahmenu/api/menu_items/${widget.restaurant.id}/',
       );
 
       if (!mounted) return;

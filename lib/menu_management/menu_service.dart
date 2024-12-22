@@ -5,7 +5,8 @@ import 'menu_item_model.dart';
 class MenuService {
   // Ganti ini sesuai domain/port Anda. Di contoh, pakai 127.0.0.1:8000.
   // Jika pakai Android emulator, bisa jadi 10.0.2.2:8000.
-  static const String baseUrl = 'http://127.0.0.1:8000/ubahmenu/api/menu_items';
+  static const String baseUrl =
+      'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/ubahmenu/api/menu_items';
 
   // Fetch menu items (GET)
   static Future<List<MenuItem>> fetchMenuItems(String restaurantId) async {

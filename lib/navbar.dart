@@ -33,8 +33,8 @@ class _NavbarState extends State<Navbar> {
   Future<void> fetchUserInfo() async {
     final request = Provider.of<CookieRequest>(context, listen: false);
     try {
-      final response =
-          await request.get('http://127.0.0.1:8000/auth/is-superuser/');
+      final response = await request.get(
+          'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/auth/is-superuser/');
       if (response != null) {
         // Perbarui hanya jika respons valid diterima
         setState(() {

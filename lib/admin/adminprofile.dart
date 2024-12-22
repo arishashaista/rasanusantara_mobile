@@ -25,7 +25,8 @@ class _AdminProfileState extends State<AdminProfile> {
 
   Future<void> fetchUserData(CookieRequest request) async {
     try {
-      final response = await request.get('http://127.0.0.1:8000/auth/user/');
+      final response = await request.get(
+          'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/auth/user/');
       if (mounted) {
         setState(() {
           username = response['username'] ?? 'Admin';
@@ -43,8 +44,8 @@ class _AdminProfileState extends State<AdminProfile> {
 
   Future<void> fetchRestaurantCount(CookieRequest request) async {
     try {
-      final response = await request
-          .get('http://127.0.0.1:8000/adminview/restaurant-count/');
+      final response = await request.get(
+          'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/adminview/restaurant-count/');
       if (mounted) {
         setState(() {
           restaurantCount = response['count'] ?? 0;
@@ -63,7 +64,8 @@ class _AdminProfileState extends State<AdminProfile> {
   void logout() async {
     final request = Provider.of<CookieRequest>(context, listen: false);
     try {
-      final response = await request.get('http://127.0.0.1:8000/auth/logout/');
+      final response = await request.get(
+          'https://arisha-shaista-rasanusantara.pbp.cs.ui.ac.id/auth/logout/');
 
       if (response['status'] == true) {
         request.loggedIn = false;
