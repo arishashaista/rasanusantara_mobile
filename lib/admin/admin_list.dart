@@ -44,6 +44,14 @@ class _AdminListPageState extends State<AdminListPage> {
   String _selectedCategory = "Semua Kategori";
   String _selectedSortOption = "Filter";
 
+  Future<void> _refreshRestaurants() async {
+    setState(() {
+      _isLoading = true;
+    });
+    final request = Provider.of<CookieRequest>(context, listen: false);
+    await fetchRestaurants(request);
+  }
+
   Future<void> fetchRestaurants(CookieRequest request) async {
     try {
       final response = await request.get('http://127.0.0.1:8000/json/');
@@ -272,6 +280,12 @@ class _AdminListPageState extends State<AdminListPage> {
                                 MaterialPageRoute(
                                   builder: (context) => AdminDetail(
                                     restaurant: _filteredRestaurants[index],
+                                    onMenuUpdated: () async {
+                                      // Refresh the entire restaurant list when menu is updated
+                                      await _refreshRestaurants();
+                                      // Reapply filters to update the filtered list
+                                      _applyFilters();
+                                    },
                                   ),
                                 ),
                               );
