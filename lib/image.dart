@@ -36,7 +36,7 @@ class AdaptiveImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (_isBase64(imageUrl)) {
-      // Jika gambar dalam format base64
+      // Jika gambar dalam format Base64
       final Uint8List imageBytes = _decodeBase64(imageUrl);
       return Image.memory(
         imageBytes,
@@ -52,24 +52,40 @@ class AdaptiveImage extends StatelessWidget {
         },
       );
     } else {
-      // Jika gambar berupa URL
-      return CachedNetworkImage(
-        imageUrl: _getProxiedUrl(imageUrl),
-        height: height,
-        width: width,
-        fit: fit,
-        placeholder: (context, url) => Container(
-          color: Colors.grey[200],
-          child: const Center(child: CircularProgressIndicator()),
-        ),
-        errorWidget: (context, url, error) {
-          print('Error loading image: $error');
-          return Container(
+      if (kIsWeb) {
+        // Gunakan CachedNetworkImage untuk platform web
+        return CachedNetworkImage(
+          imageUrl: _getProxiedUrl(imageUrl),
+          height: height,
+          width: width,
+          fit: fit,
+          placeholder: (context, url) => Container(
             color: Colors.grey[200],
-            child: const Icon(Icons.error),
-          );
-        },
-      );
+            child: const Center(child: CircularProgressIndicator()),
+          ),
+          errorWidget: (context, url, error) {
+            print('Error loading image: $error');
+            return Container(
+              color: Colors.grey[200],
+              child: const Icon(Icons.error),
+            );
+          },
+        );
+      } else {
+        // Gunakan Image.network untuk platform mobile
+        return Image.network(
+          imageUrl,
+          height: height,
+          width: width,
+          fit: fit,
+          errorBuilder: (context, error, stackTrace) => Container(
+            color: Colors.grey[300],
+            height: height,
+            width: width,
+            child: const Icon(Icons.image, size: 50, color: Colors.grey),
+          ),
+        );
+      }
     }
   }
 }
