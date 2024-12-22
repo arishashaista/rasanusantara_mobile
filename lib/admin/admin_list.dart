@@ -281,9 +281,7 @@ class _AdminListPageState extends State<AdminListPage> {
                                   builder: (context) => AdminDetail(
                                     restaurant: _filteredRestaurants[index],
                                     onMenuUpdated: () async {
-                                      // Refresh the entire restaurant list when menu is updated
                                       await _refreshRestaurants();
-                                      // Reapply filters to update the filtered list
                                       _applyFilters();
                                     },
                                   ),
