@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:rasanusantara_mobile/favorite/favorite_provider.dart';
+import 'package:rasanusantara_mobile/navbar.dart';
 import 'package:rasanusantara_mobile/restaurant.dart';
 import 'package:rasanusantara_mobile/favorite/favoritecard.dart';
 
@@ -250,22 +251,59 @@ class _ProfileFavoriteState extends State<ProfileFavorite> {
                     ),
                     Expanded(
                       child: favorites.isEmpty
-                          ? const Center(
-                              child: Text(
-                                'Kamu belum memiliki restoran favorit.',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey,
-                                ),
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    'Kamu belum mempunyai restoran favorit.',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey,
+                                      fontFamily: 'Montserrat',
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const Navbar(selectedIndex: 1),
+                                        ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.orange,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 12,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Cari Restoran',
+                                      style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 14,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             )
-                          : displayRestaurants.isEmpty
+                          : searchQuery.isNotEmpty && displayRestaurants.isEmpty
                               ? const Center(
                                   child: Text(
                                     'Tidak ada restoran yang dicari.',
                                     style: TextStyle(
                                       fontSize: 16,
                                       color: Colors.grey,
+                                      fontFamily: 'Montserrat',
                                     ),
                                   ),
                                 )
