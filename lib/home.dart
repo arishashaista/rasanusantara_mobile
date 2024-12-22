@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:rasanusantara_mobile/Katalog/screens/restaurant_list_page.dart';
 import 'dart:convert';
 import 'package:rasanusantara_mobile/card.dart';
+import 'package:rasanusantara_mobile/image.dart';
 import 'package:rasanusantara_mobile/navbar.dart';
 import 'package:rasanusantara_mobile/restaurant.dart';
 import 'package:rasanusantara_mobile/Katalog/screens/restaurant_detail_page.dart';
@@ -266,19 +267,11 @@ class _MenuPageState extends State<MenuPage> {
           return ListTile(
             leading: ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                restaurant.image,
+              child: AdaptiveImage(
+                imageUrl: restaurant.image,
                 width: 50,
                 height: 50,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    width: 110,
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.restaurant,
-                        color: Colors.grey, size: 20),
-                  );
-                },
               ),
             ),
             title: Text(

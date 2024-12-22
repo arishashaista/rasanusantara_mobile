@@ -1,3 +1,5 @@
+import 'package:rasanusantara_mobile/image.dart';
+
 class Restaurant {
   String id; // UUID dari "pk"
   String name; // Diambil dari fields["name"]

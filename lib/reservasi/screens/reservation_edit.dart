@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:rasanusantara_mobile/navbar.dart';
 import 'package:rasanusantara_mobile/reservasi/screens/reservation_user.dart';
 import 'dart:convert';
+import 'package:rasanusantara_mobile/image.dart';
 
 class ReservationEditPage extends StatefulWidget {
   final int reservationId;
@@ -116,20 +117,11 @@ class _ReservationEditPageState extends State<ReservationEditPage> {
         child: Column(
           children: [
             // Header Image
-            Image.network(
-              widget.restaurantImage,
+            AdaptiveImage(
+              imageUrl: widget.restaurantImage,
               height: 200,
               width: double.infinity,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  height: 200,
-                  color: Colors.grey[300],
-                  child: Center(
-                    child: Icon(Icons.restaurant, size: 50, color: Colors.grey),
-                  ),
-                );
-              },
             ),
             SizedBox(height: 16),
 

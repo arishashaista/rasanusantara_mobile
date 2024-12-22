@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:rasanusantara_mobile/admin/delete_restaurant.dart';
 import 'package:rasanusantara_mobile/admin/edit_restaurant.dart';
+import 'package:rasanusantara_mobile/image.dart';
 import 'package:rasanusantara_mobile/restaurant.dart';
 import 'package:rasanusantara_mobile/review/screens/review_page.dart';
 import 'package:rasanusantara_mobile/menu_management/menu_management_screen.dart';
@@ -84,24 +85,11 @@ class _AdminDetailState extends State<AdminDetail> {
                       Container(
                         height: 200,
                         width: double.infinity,
-                        child: Image.network(
-                          widget.restaurant.image.isNotEmpty
+                        child: AdaptiveImage(
+                          imageUrl: widget.restaurant.image.isNotEmpty
                               ? widget.restaurant.image
                               : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhdkA-pOR1l5lRdCAtAAA2XSt2qg-WxQcg5A&s',
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              height: 200,
-                              color: Colors.grey[200],
-                              child: const Center(
-                                child: Icon(
-                                  Icons.restaurant,
-                                  color: Colors.grey,
-                                  size: 50,
-                                ),
-                              ),
-                            );
-                          },
                         ),
                       ),
                       Positioned(

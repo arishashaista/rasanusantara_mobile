@@ -3,6 +3,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import '../models/review.dart';
+import 'package:rasanusantara_mobile/image.dart';
 
 class ReviewPage extends StatefulWidget {
   final String restaurantName;

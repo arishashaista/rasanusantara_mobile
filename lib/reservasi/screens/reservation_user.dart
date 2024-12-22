@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'reservation_delete.dart';
 import 'reservation_edit.dart';
 import 'package:intl/intl.dart';
+import 'package:rasanusantara_mobile/image.dart';
 
 class ReservationUserPage extends StatefulWidget {
   const ReservationUserPage({super.key});
@@ -194,20 +195,11 @@ class _ReservationUserPageState extends State<ReservationUserPage> {
                             child: ListTile(
                               leading: ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
-                                child: Image.network(
-                                  reservation['restaurant_image'],
+                                child: AdaptiveImage(
+                                  imageUrl: reservation['restaurant_image'],
                                   width: 80,
                                   height: 80,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      width: 80,
-                                      height: 80,
-                                      color: Colors.grey[300],
-                                      child: const Icon(Icons.restaurant,
-                                          color: Colors.grey),
-                                    );
-                                  },
                                 ),
                               ),
                               title: Text(reservation['restaurant'],

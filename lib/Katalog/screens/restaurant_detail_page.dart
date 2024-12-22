@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:rasanusantara_mobile/favorite/favorite_provider.dart';
+import 'package:rasanusantara_mobile/image.dart';
 import 'package:rasanusantara_mobile/reservasi/screens/reservation_form.dart';
 import 'package:rasanusantara_mobile/restaurant.dart';
 import 'package:rasanusantara_mobile/review/screens/review_page.dart';
@@ -47,24 +48,11 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                     Container(
                       height: 200,
                       width: double.infinity,
-                      child: Image.network(
-                        widget.restaurant.image.isNotEmpty
+                      child: AdaptiveImage(
+                        imageUrl: widget.restaurant.image.isNotEmpty
                             ? widget.restaurant.image
                             : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhdkA-pOR1l5lRdCAtAAA2XSt2qg-WxQcg5A&s',
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            height: 200,
-                            color: Colors.grey[200],
-                            child: const Center(
-                              child: Icon(
-                                Icons.restaurant,
-                                color: Colors.grey,
-                                size: 50,
-                              ),
-                            ),
-                          );
-                        },
                       ),
                     ),
                     Positioned(

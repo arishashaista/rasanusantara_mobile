@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:rasanusantara_mobile/navbar.dart';
 import 'package:rasanusantara_mobile/reservasi/screens/reservation_user.dart';
 import 'dart:convert';
+import 'package:rasanusantara_mobile/image.dart';
 
 class ReservationForm extends StatefulWidget {
   final String restaurantid;
@@ -86,22 +87,9 @@ class _ReservationFormState extends State<ReservationForm> {
               Container(
                 height: 200,
                 width: double.infinity,
-                child: Image.network(
-                  widget.restaurantImage,
+                child: AdaptiveImage(
+                  imageUrl: widget.restaurantImage,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      height: 200,
-                      color: Colors.grey[200],
-                      child: Center(
-                        child: Icon(
-                          Icons.restaurant,
-                          color: Colors.grey[400],
-                          size: 50,
-                        ),
-                      ),
-                    );
-                  },
                 ),
               ),
               SizedBox(height: 20),

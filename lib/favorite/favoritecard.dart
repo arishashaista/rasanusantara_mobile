@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:rasanusantara_mobile/favorite/favorite_provider.dart';
+import 'package:rasanusantara_mobile/image.dart';
 import 'package:rasanusantara_mobile/restaurant.dart';
 import 'package:rasanusantara_mobile/Katalog/screens/restaurant_detail_page.dart';
 
@@ -59,23 +60,13 @@ class _FavoriteProductCardState extends State<FavoriteProductCard> {
                     topLeft: Radius.circular(12),
                     bottomLeft: Radius.circular(12),
                   ),
-                  child: Image.network(
-                    widget.restaurant.image.isNotEmpty
+                  child: AdaptiveImage(
+                    imageUrl: widget.restaurant.image.isNotEmpty
                         ? widget.restaurant.image
                         : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhdkA-pOR1l5lRdCAtAAA2XSt2qg-WxQcg5A&s',
                     width: 110,
                     height: 100,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: Colors.grey[300],
-                      width: 110,
-                      height: 100,
-                      child: const Icon(
-                        Icons.image,
-                        size: 50,
-                        color: Colors.grey,
-                      ),
-                    ),
                   ),
                 ),
                 const SizedBox(width: 8),

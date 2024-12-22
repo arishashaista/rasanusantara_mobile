@@ -3,6 +3,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:rasanusantara_mobile/navbar.dart';
 import 'package:rasanusantara_mobile/reservasi/screens/reservation_user.dart';
+import 'package:rasanusantara_mobile/image.dart';
 
 class ReservationDeletePage extends StatelessWidget {
   final int reservationId;

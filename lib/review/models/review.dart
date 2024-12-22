@@ -3,6 +3,7 @@
 //     final review = reviewFromJson(jsonString);
 
 import 'dart:convert';
+import 'package:rasanusantara_mobile/image.dart';
 
 List<Review> reviewFromJson(String str) =>
     List<Review>.from(json.decode(str).map((x) => Review.fromJson(x)));

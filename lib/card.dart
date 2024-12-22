@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:rasanusantara_mobile/restaurant.dart';
 import 'package:rasanusantara_mobile/Katalog/screens/restaurant_detail_page.dart';
 import 'package:rasanusantara_mobile/favorite/favorite_provider.dart';
+import 'package:rasanusantara_mobile/image.dart';
 
 class FavoriteProductCard extends StatefulWidget {
   final Restaurant restaurant;
@@ -63,8 +64,8 @@ class _FavoriteProductCardState extends State<FavoriteProductCard> {
                                 topLeft: Radius.circular(8),
                                 topRight: Radius.circular(8),
                               ),
-                              child: Image.network(
-                                widget.restaurant.image,
+                              child: AdaptiveImage(
+                                imageUrl: widget.restaurant.image,
                                 fit: BoxFit.cover,
                                 width: double.infinity,
                               ),

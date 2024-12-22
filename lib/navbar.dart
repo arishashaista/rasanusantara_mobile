@@ -9,6 +9,7 @@ import 'package:rasanusantara_mobile/favorite/profileandfavorite.dart';
 import 'package:rasanusantara_mobile/authentication/screens/login.dart';
 import 'package:rasanusantara_mobile/Katalog/screens/restaurant_list_page.dart';
 import 'package:rasanusantara_mobile/reservasi/screens/reservation_user.dart';
+import 'package:rasanusantara_mobile/image.dart';
 
 class Navbar extends StatefulWidget {
   final int selectedIndex;

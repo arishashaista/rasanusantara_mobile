@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:rasanusantara_mobile/image.dart';
 import 'package:rasanusantara_mobile/restaurant.dart';
-import 'package:rasanusantara_mobile/favorite/favorite_provider.dart';
 
 class AdminCard extends StatelessWidget {
   final Restaurant restaurant;
@@ -34,19 +34,11 @@ class AdminCard extends StatelessWidget {
                   topLeft: Radius.circular(12),
                   bottomLeft: Radius.circular(12),
                 ),
-                child: Image.network(
-                  restaurant.image,
+                child: AdaptiveImage(
+                  imageUrl: restaurant.image,
                   width: 110,
                   height: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: 110,
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.restaurant,
-                          color: Colors.grey, size: 50),
-                    );
-                  },
                 ),
               ),
               const SizedBox(width: 8),

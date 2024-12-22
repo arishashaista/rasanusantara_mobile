@@ -1,3 +1,5 @@
+import 'package:rasanusantara_mobile/image.dart';
+
 class MenuItem {
   final String id;
   final String name;
