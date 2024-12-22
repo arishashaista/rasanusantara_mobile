@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class DeleteRestaurantPage extends StatefulWidget {
   final String restaurantId;
@@ -21,17 +23,24 @@ class _DeleteRestaurantPageState extends State<DeleteRestaurantPage> {
     setState(() => _isLoading = true);
 
     try {
-      final request = Provider.of<CookieRequest>(context, listen: false);
-      final url = 'http://127.0.0.1:8000/adminview/delete/${widget.restaurantId}/';
+      final url = Uri.parse('http://127.0.0.1:8000/adminview/delete-json/${widget.restaurantId}/');
+      
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+      );
 
-      // Make a POST request with empty body or an optional payload
-      final response = await request.post(url, {});
       if (!mounted) return;
 
-      if (response != null) {
-        Navigator.pop(context, true); 
+      final responseData = jsonDecode(response.body);
+      
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(responseData['message'])),
+        );
+        Navigator.pop(context, true);
       } else {
-        throw Exception('Failed to delete restaurant');
+        throw Exception(responseData['message'] ?? 'Failed to delete restaurant');
       }
     } catch (e) {
       if (!mounted) return;

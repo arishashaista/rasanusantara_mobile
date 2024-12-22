@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class EditRestaurantPage extends StatefulWidget {
   final String restaurantId;
@@ -56,28 +58,30 @@ class _EditRestaurantPageState extends State<EditRestaurantPage> {
     setState(() => _isLoading = true);
 
     try {
-      final request = Provider.of<CookieRequest>(context, listen: false);
-
-      // This matches 'path("edit/<str:uuid>/", edit_restaurant, name="edit_restaurant")'
-      final url = 'http://127.0.0.1:8000/adminview/edit/${widget.restaurantId}/';
-
-      final response = await request.post(url, {
-        'name': _nameController.text,
-        'location': _locationController.text,
-        'average_price': _priceController.text,
-        'rating': _ratingController.text,
-      });
+      final url = Uri.parse('http://127.0.0.1:8000/adminview/edit-json/${widget.restaurantId}/');
+      
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'name': _nameController.text,
+          'location': _locationController.text,
+          'average_price': double.tryParse(_priceController.text) ?? 0.0,
+          'rating': double.tryParse(_ratingController.text) ?? 0.0,
+        }),
+      );
 
       if (!mounted) return;
 
-      if (response['success'] == true) {
+      final responseData = jsonDecode(response.body);
+      
+      if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? 'Success')),
+          SnackBar(content: Text(responseData['message'])),
         );
         Navigator.pop(context, true);
       } else {
-        // Show error
-        throw Exception(response['message'] ?? 'Failed to update');
+        throw Exception(responseData['message'] ?? 'Failed to update restaurant');
       }
     } catch (e) {
       if (!mounted) return;
